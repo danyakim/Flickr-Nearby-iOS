@@ -48,34 +48,33 @@ class PostCollectionViewCell: UICollectionViewCell {
     
     func configurePicture(for post: Post) {
         post.picture.load()
-        do {
-            let photo = try Data(contentsOf: post.picture.url)
-            picture.image = UIImage(data: photo)
-            
-            let tap = UITapGestureRecognizer(target: self, action: #selector(showImage))
-            picture.isUserInteractionEnabled = true
-            picture.addGestureRecognizer(tap)
-            
-        } catch {
-            print("Couldn't load picture: ", error.localizedDescription)
-        }
+        picture.setImage(fromURL: post.picture.url)
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(showImage))
+        picture.isUserInteractionEnabled = true
+        picture.addGestureRecognizer(tap)
+        //        do {
+        //            let photo = try Data(contentsOf: post.picture.url)
+        //            picture.image = UIImage(data: photo)
+        //
+        //            let tap = UITapGestureRecognizer(target: self, action: #selector(showImage))
+        //            picture.isUserInteractionEnabled = true
+        //            picture.addGestureRecognizer(tap)
+        //
+        //        } catch {
+        //            print("Couldn't load picture: ", error.localizedDescription)
+        //        }
     }
     
     func configureUserProfilePicture(for post: Post) {
         FlickrAPI.shared.getUserDetails(forUser: post.user) { response in
             switch response {
             case .success(let user):
-                do {
-                    let profilePicture = try Data(contentsOf: user.photoURL!)
-                    
                     DispatchQueue.main.async {
-                        self.userImage.image = UIImage(data: profilePicture)
+                        self.userImage.setImage(fromURL: user.photoURL!)
                         self.userName.text = user.name
                     }
-                    
-                } catch {
-                    print("Couldn't load user profile picture: ", error.localizedDescription)
-                }
+
             case .failure(let error):
                 print("Failed to get user info: ", error.localizedDescription)
             }
@@ -84,6 +83,24 @@ class PostCollectionViewCell: UICollectionViewCell {
     
     @objc func showImage() {
         delegate?.postCollectionViewCell(cell: self, didTapOn: post!.picture)
+    }
+    
+}
+
+extension UIImageView {
+    
+    func setImage(fromURL url: URL) {
+        
+        // just not to cause a deadlock in UI!
+        DispatchQueue.global().async {
+            guard let imageData = try? Data(contentsOf: url) else { return }
+            
+            let image = UIImage(data: imageData)
+            
+            DispatchQueue.main.async {
+                self.image = image
+            }
+        }
     }
     
 }

@@ -5,7 +5,7 @@
 //  Created by Daniil Kim on 07.05.2021.
 //
 
-import Foundation
+import UIKit
 
 class Picture {
     
@@ -28,3 +28,4 @@ class Picture {
         })
     }
 }
+
