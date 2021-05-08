@@ -34,7 +34,8 @@ class ImageViewController: UIViewController,
         configureImage()
         
         scrollView.delegate = self
-        scrollView.isScrollEnabled = false
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.showsHorizontalScrollIndicator = false
         
         scrollView.minimumZoomScale = 1
         scrollView.maximumZoomScale = 5
@@ -49,36 +50,21 @@ class ImageViewController: UIViewController,
     
     //MARK: - Helping Functions
     
-//    func updateConstraints(for size: CGSize) {
-//        let yOffset = max(0, (size.height - imageView.frame.height) / 2)
-//        imageViewTop.constant = yOffset
-//        imageViewBottom.constant = yOffset
-//        
-//        let xOffset = max(0, (size.width - imageView.frame.width) / 2)
-//        imageViewLeading.constant = xOffset
-//        imageViewTrailing.constant = xOffset
-//        
-//        view.layoutIfNeeded()
-//    }
-    
     func configureImage() {
         if let pictureURL = pictureURL {
-
-                do {
-                    let imageData = try Data(contentsOf: pictureURL)
-                    DispatchQueue.main.async {
-                        self.imageView.image = UIImage(data: imageData)
-                    }
-                } catch {
-                    print("Couldn't load picture data: ",error.localizedDescription)
+            
+            do {
+                let imageData = try Data(contentsOf: pictureURL)
+                DispatchQueue.main.async {
+                    self.imageView.image = UIImage(data: imageData)
                 }
-
+            } catch {
+                print("Couldn't load picture data: ",error.localizedDescription)
+            }
+            
             imageView.contentMode = .scaleAspectFit
             imageView.isUserInteractionEnabled = true
             
-            let standardPan = UIPanGestureRecognizer(target: self,
-                                                     action: #selector(imageHandlePan(_:)))
-            imageView.addGestureRecognizer(standardPan)
         }
     }
     
@@ -88,21 +74,4 @@ class ImageViewController: UIViewController,
         return imageView
     }
     
-    @objc func imageHandlePan(_ sender: UIPanGestureRecognizer) {
-        guard let targetView = sender.view else { return }
-        
-        let translation = sender.translation(in: view)
-        
-        if sender.state == .began {
-            initialCenter = targetView.center
-        }
-        
-        if sender.state != .cancelled{
-            targetView.center = CGPoint(x: targetView.center.x + translation.x,
-                                        y: targetView.center.y + translation.y)
-            sender.setTranslation(CGPoint.zero, in: view)
-        } else {
-            targetView.center = initialCenter!
-        }
-    }
 }
