@@ -8,13 +8,21 @@
 import Foundation
 
 struct K {
-    static let flickrAPIKey = "f8857da55742c186c25fdf14f9753ade"
-    static let flickrSecret = "89ec82f4422cb36f"
+    struct API {
+        static let flickrAPIKey = "f8857da55742c186c25fdf14f9753ade"
+        static let flickrSecret = "89ec82f4422cb36f"
+        
+        static let per_page = 3
+    }
     
+    struct imageNames {
+        static let flickrLogo = "flickrLogoText"
+    }
     
-    static let flickrLogo = "flickrLogoText"
-    
-    static let cellIdentifier = "PostCell"
+    struct cells {
+        static let reuseIdentifier = "PostCell"
+        static let nibName = "PostCollectionViewCell"
+    }
     
     struct segueIdentifiers {
         static let showImage = "ShowImage"

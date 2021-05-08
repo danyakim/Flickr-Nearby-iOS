@@ -8,12 +8,16 @@
 import Foundation
 import FlickrKit
 
+enum FlickrAPIError: Error {
+    case noResults
+}
+
 class FlickrAPI {
     
     static let shared = FlickrAPI()
     
     init() {
-        FlickrKit.shared().initialize(withAPIKey: K.flickrAPIKey, sharedSecret: K.flickrSecret)
+        FlickrKit.shared().initialize(withAPIKey: K.API.flickrAPIKey, sharedSecret: K.API.flickrSecret)
     }
     
     //MARK: - Variables
@@ -22,14 +26,23 @@ class FlickrAPI {
     
     //MARK: - Methods
     
-    func getPhotosNear(latitude: String, longitude: String, page: Int, completion: @escaping (Result<([Post], Int)?, Error>) -> ()) {
+    func getPhotos(location: (String, String)? = nil, tag: String? = nil, page: Int, completion: @escaping (Result<([Post], Int)?, Error>) -> ()) {
         
         let search = FKFlickrPhotosSearch()
-        search.lat = latitude
-        search.lon = longitude
+        
+        if let location = location {
+            search.lat = location.0
+            search.lon = location.1
+            search.radius = "1"
+        } else {
+            search.tags = tag!
+        }
+        
         search.page = "\(page)"
-        search.radius = "1"
-        search.per_page = "5"
+        search.per_page = "\(K.API.per_page)"
+        
+        search.sort = "interestingness-desc"
+        search.extras = "owner_name, url_m, url_l, url_t, url_s, url_n, url_z, url_c"
         
         FlickrKit.shared().call(search) { response, error in
             if let error = error {
@@ -39,126 +52,58 @@ class FlickrAPI {
             }
             
             if let response = response {
-                var result = [Post]()
-                
-                let photos = response["photos"] as! [String: AnyObject]
-                
-                let totalPages = photos["pages"]! as! Int
-                
-                let photoArray = photos["photo"] as! [[String: AnyObject]]
-                for photo in photoArray {
-                    
-                    let title = "\(photo["title"]!)"
-                    let ownerID = "\(photo["owner"]!)"
-                    
-                    let pictureID = "\(photo["id"]!)"
-                    let server = "\(photo["server"]!)"
-                    let secret = "\(photo["secret"]!)"
-                    let farm = "\(photo["farm"]!)"
-                    
-                    let picture = Picture(id: pictureID, server: server, secret: secret, farm: farm)
-                    
-                    let post = Post(title: title, ownerID: ownerID, picture: picture)
-                    
-                    result.append(post)
+                if let posts = self.parse(response) {
+                    completion(.success(posts))
+                } else {
+                    print("Search didn't give results")
+                    completion(.failure(FlickrAPIError.noResults))
                 }
-                completion(.success((result, totalPages)))
             }
         }
     }
     
-    func getUserDetails(forUser user: User, completion: @escaping (Result<User,Error>) -> ()){
-        if let userFound = cachedUsers[user.id] {
-            completion(.success(userFound))
-            return
-        }
+    //MARK: - Helping Functions
+    
+    func parse(_ response: [String: Any]) -> ([Post], Int)? {
+        var result = [Post]()
         
-        let getUserInfo = FKFlickrPeopleGetInfo()
-        getUserInfo.user_id = user.id
+        let photos = response["photos"] as! [String: AnyObject]
+        let totalPages = photos["pages"]! as! Int
         
-        FlickrKit.shared().call(getUserInfo) {[weak self] response, error in
-            if let error = error {
-                completion(.failure(error))
-                return
+        let photoArray = photos["photo"] as! [[String: AnyObject]]
+        
+        if photoArray.count == 0 { return nil }
+        
+        for photo in photoArray {
+            //get post data
+            let title = "\(photo["title"]!)"
+            if photo["url_m"] == nil {
+                print("no middle res picture")
             }
             
-            if let response = response {
-                let person = response["person"] as! [String: Any]
-                let usernameDict = person["username"] as! [String: Any]
-                let username = usernameDict["_content"]!
-                
-                let iconserver = person["iconserver"]!
-                let iconfarm = person["iconfarm"]!
-                let buddyimageURL = "https://farm\(iconfarm).staticflickr.com/\(iconserver)/buddyicons/\(user.id).jpg"
-                
-                user.name = "\(username)"
-                user.photoURL = URL(string: buddyimageURL)
-                
-                self?.cachedUsers[user.id] = user
-                
-                completion(.success(user))
-            }
-        }
-    }
-    
-    func getPhotosTagged(with tag: String, page: Int, completion: @escaping (Result<([Post], Int)?, Error>) -> ()){
-        
-        let search = FKFlickrPhotosSearch()
-        search.tags = tag
-        search.page = "\(page)"
-        search.per_page = "5"
-        
-        FlickrKit.shared().call(search) { response, error in
-            if let error = error {
-                print("Failed to find photos with tag \"\(tag)\": ", error.localizedDescription)
-                completion(.failure(error))
-                return
-            }
+            let availableResolution = photo["url_m"] ?? photo["url_n"] ?? photo["url_s"] ?? photo["url_t"]!
+            let highestAvailableResolution = photo["url_l"] ?? photo["url_c"] ?? photo["url_z"] ?? availableResolution
             
-            if let response = response {
-                var result = [Post]()
-                
-                let photos = response["photos"] as! [String: AnyObject]
-                
-                let totalPages = photos["pages"]! as! Int
-                
-                let photoArray = photos["photo"] as! [[String: AnyObject]]
-                for photo in photoArray {
-                    
-                    let title = "\(photo["title"]!)"
-                    let ownerID = "\(photo["owner"]!)"
-                    
-                    let pictureID = "\(photo["id"]!)"
-                    let server = "\(photo["server"]!)"
-                    let secret = "\(photo["secret"]!)"
-                    let farm = "\(photo["farm"]!)"
-                    
-                    let picture = Picture(id: pictureID, server: server, secret: secret, farm: farm)
-                    
-                    let post = Post(title: title, ownerID: ownerID, picture: picture)
-                    
-                    result.append(post)
-                }
-                completion(.success((result, totalPages)))
-            }
+            let pictureURL = URL(string: "\(availableResolution)")!
+            
+            let highResURL = URL(string: "\(highestAvailableResolution)")!
+            
+            let post = Post(title: title, pictureURL: pictureURL, highResURL: highResURL)
+            
+            //get user data
+            let username = "\(photo["ownername"]!)"
+            
+            let ownerID = "\(photo["owner"]!)"
+            let iconserver = "\(photo["server"]!)"
+            let iconfarm = "\(photo["farm"]!)"
+            let buddyimageURL = "https://farm\(iconfarm).staticflickr.com/\(iconserver)/buddyicons/\(ownerID).jpg"
+            
+            post.user = User(name: username, photoURL: URL(string: buddyimageURL)!)
+            
+            result.append(post)
         }
+        
+        return (result, totalPages)
     }
     
-    func getHighResolutionPicture(_ picture: Picture, completion: @escaping (URL) -> ()) {
-        let photoURL = FlickrKit.shared().photoURL(for: .large1024,
-                                                   photoID: picture.id,
-                                                   server: picture.server,
-                                                   secret: picture.secret,
-                                                   farm: picture.farm)
-        completion(photoURL)
-    }
-    
-    func getMediumResolutionPicture(_ picture: Picture, completion: @escaping (URL) -> ()) {
-        let photoURL = FlickrKit.shared().photoURL(for: .medium640,
-                                                   photoID: picture.id,
-                                                   server: picture.server,
-                                                   secret: picture.secret,
-                                                   farm: picture.farm)
-        completion(photoURL)
-    }
 }

@@ -22,7 +22,7 @@ class ImageViewController: UIViewController,
     
     //MARK: - Variables
     
-    var picture: Picture?
+    var pictureURL: URL?
     
     var initialCenter: CGPoint?
     
@@ -49,30 +49,30 @@ class ImageViewController: UIViewController,
     
     //MARK: - Helping Functions
     
-    func updateConstraints(for size: CGSize) {
-        let yOffset = max(0, (size.height - imageView.frame.height) / 2)
-        imageViewTop.constant = yOffset
-        imageViewBottom.constant = yOffset
-        
-        let xOffset = max(0, (size.width - imageView.frame.width) / 2)
-        imageViewLeading.constant = xOffset
-        imageViewTrailing.constant = xOffset
-        
-        view.layoutIfNeeded()
-    }
+//    func updateConstraints(for size: CGSize) {
+//        let yOffset = max(0, (size.height - imageView.frame.height) / 2)
+//        imageViewTop.constant = yOffset
+//        imageViewBottom.constant = yOffset
+//        
+//        let xOffset = max(0, (size.width - imageView.frame.width) / 2)
+//        imageViewLeading.constant = xOffset
+//        imageViewTrailing.constant = xOffset
+//        
+//        view.layoutIfNeeded()
+//    }
     
     func configureImage() {
-        if let picture = picture {
-            FlickrAPI.shared.getHighResolutionPicture(picture) { url in
+        if let pictureURL = pictureURL {
+
                 do {
-                    let imageData = try Data(contentsOf: url)
+                    let imageData = try Data(contentsOf: pictureURL)
                     DispatchQueue.main.async {
                         self.imageView.image = UIImage(data: imageData)
                     }
                 } catch {
                     print("Couldn't load picture data: ",error.localizedDescription)
                 }
-            }
+
             imageView.contentMode = .scaleAspectFit
             imageView.isUserInteractionEnabled = true
             

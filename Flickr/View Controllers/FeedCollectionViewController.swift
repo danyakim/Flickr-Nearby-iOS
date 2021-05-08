@@ -33,10 +33,8 @@ class FeedCollectionViewController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        collectionView.dataSource = posts
-//        collectionView.prefetchDataSource = posts
-        
-        collectionView.register(UINib(nibName: "PostCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "PostCell")
+        collectionView.register(UINib(nibName: K.cells.nibName, bundle: nil),
+                                forCellWithReuseIdentifier: K.cells.reuseIdentifier)
         
         if tabBarController?.tabBar.selectedItem?.tag == 1 { isSearch = true }
         
@@ -46,7 +44,7 @@ class FeedCollectionViewController: UICollectionViewController {
         
         if isSearch {
             navigationItem.titleView = searchBar
-        
+            
             searchBar.delegate = self
             
             hideKeyboardWhenTappedOutside()
@@ -83,11 +81,16 @@ class FeedCollectionViewController: UICollectionViewController {
     
     override func collectionView(_ collectionView: UICollectionView,
                                  cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PostCell", for: indexPath) as! PostCollectionViewCell
+        print("cell for :\(indexPath.row)")
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: K.cells.reuseIdentifier, for: indexPath) as! PostCollectionViewCell
+        
+        cell.layer.shouldRasterize = true
+        cell.layer.rasterizationScale = UIScreen.main.scale
         
         cell.post = posts[indexPath.row]
         cell.delegate = self
         cell.configure()
+        
         return cell
     }
     
@@ -96,7 +99,7 @@ class FeedCollectionViewController: UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView,
                                  willDisplay cell: UICollectionViewCell,
                                  forItemAt indexPath: IndexPath) {
-        
+//        print("will display :\(indexPath.row)")
         if indexPath.row >= posts.count - 2 {
             //load next page
             if page < totalPages {
@@ -107,9 +110,8 @@ class FeedCollectionViewController: UICollectionViewController {
                 } else {
                     loadNearbyPosts(on: page)
                 }
-                
-                print("Current page:", page )
             }
+            
         }
     }
     
@@ -122,22 +124,14 @@ class FeedCollectionViewController: UICollectionViewController {
             return
         }
         
-        FlickrAPI.shared.getPhotosNear(latitude: lat,
-                                       longitude: lon,
-                                       page: page) { [weak self] result in
+        FlickrAPI.shared.getPhotos(location: (lat, lon),
+                                   page: page) { [weak self] result in
             guard let self = self else { return }
             
             switch result {
             case .success(let response):
                 DispatchQueue.main.async {
-                    self.posts += response!.0
-                    self.totalPages = response!.1
-                    
-                    var indexPaths = [IndexPath]()
-                    for row in self.posts.count - 6 ..<  self.posts.count {
-                        indexPaths.append(IndexPath(row: row, section: 0))
-                    }
-                    self.collectionView.insertItems(at: indexPaths)
+                    self.updatePostsAndTotalPages(with: response)
                 }
                 
             case .failure(let error):
@@ -147,13 +141,13 @@ class FeedCollectionViewController: UICollectionViewController {
         }
     }
     
-    private func loadSearchResults(with tag: String, on page: Int = 1) {
-        FlickrAPI.shared.getPhotosTagged(with: tag, page: page) {[weak self] result in
+    private func loadSearchResults(with tag: String,
+                                   on page: Int = 1) {
+        FlickrAPI.shared.getPhotos(tag: tag, page: page) { [weak self] result in
             guard let self = self else { return }
             
             switch result {
             case .success(let response):
-                
                 var shouldScrollToTop = false
                 if tag != self.previousSearch{
                     shouldScrollToTop = true
@@ -162,19 +156,16 @@ class FeedCollectionViewController: UICollectionViewController {
                 self.previousSearch = tag
                 
                 DispatchQueue.main.async {
-                    if shouldScrollToTop { self.scrollToTop()}
+                    if shouldScrollToTop { self.scrollToTop() }
                     
-                    self.posts += response!.0
-                    self.totalPages = response!.1
-                    
-                    var indexPaths = [IndexPath]()
-                    for row in self.posts.count - 6 ..<  self.posts.count {
-                        indexPaths.append(IndexPath(row: row, section: 0))
-                    }
-                    self.collectionView.insertItems(at: indexPaths)
+                    self.updatePostsAndTotalPages(with: response)
                 }
                 
             case .failure(let error):
+                DispatchQueue.main.async {
+                    self.posts = []
+                    self.collectionView.reloadData()
+                }
                 print("Failed to get photos: ", error.localizedDescription)
             //show error to user
             }
@@ -183,8 +174,17 @@ class FeedCollectionViewController: UICollectionViewController {
     
     //MARK: - Helping Functions
     
+    private func updatePostsAndTotalPages(with response: ([Post], Int)?) {
+        posts += response!.0
+        totalPages = response!.1
+        
+        for row in self.posts.count - K.API.per_page - 1 ..<  self.posts.count {
+            self.collectionView.insertItems(at: [IndexPath(row: row, section: 0)])
+        }
+    }
+    
     private func setLogo() {
-        let logo = UIImage(named: K.flickrLogo)!
+        let logo = UIImage(named: K.imageNames.flickrLogo)!
         
         let logoButton = UIButton(type: .custom)
         logoButton.setImage(logo, for: .normal)
@@ -276,14 +276,14 @@ extension FeedCollectionViewController: UISearchBarDelegate {
 
 extension FeedCollectionViewController: PostCollectionViewCellDelegate {
     
-    func postCollectionViewCell(cell: PostCollectionViewCell, didTapOn picture: Picture) {
-        performSegue(withIdentifier: K.segueIdentifiers.showImage, sender: picture)
+    func postCollectionViewCell(cell: PostCollectionViewCell, didTapOn pictureURL: URL) {
+        performSegue(withIdentifier: K.segueIdentifiers.showImage, sender: pictureURL)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == K.segueIdentifiers.showImage {
             let imageVC = segue.destination as! ImageViewController
-            imageVC.picture = (sender as! Picture)
+            imageVC.pictureURL = (sender as! URL)
         }
     }
 }
