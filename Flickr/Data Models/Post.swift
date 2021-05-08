@@ -11,13 +11,15 @@ class Post {
     
     var title: String!
    
-    var picture: Picture
+    var pictureURL: URL!
+    var highResPictureURL: URL!
+    
     var user: User!
     
-    init(title: String, ownerID: String, picture: Picture) {
+    init(title: String, pictureURL: URL, highResURL: URL) {
         self.title = title
-        self.user = User(id: ownerID)
-        self.picture = picture
+        self.pictureURL = pictureURL
+        self.highResPictureURL = highResURL
     }
     
 }

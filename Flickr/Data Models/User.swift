@@ -8,11 +8,11 @@
 import Foundation
 
 class User {
-    var id: String
-    var name: String?
-    var photoURL: URL?
+    var name: String
+    var photoURL: URL
     
-    init(id: String) {
-        self.id = id
+    init(name: String, photoURL: URL) {
+        self.name = name
+        self.photoURL = photoURL
     }
 }
