@@ -41,7 +41,6 @@ class FlickrAPI {
         search.page = "\(page)"
         search.per_page = "\(K.API.per_page)"
         
-        search.sort = "interestingness-desc"
         search.extras = "owner_name, url_m, url_l, url_t, url_s, url_n, url_z, url_c"
         
         FlickrKit.shared().call(search) { response, error in
