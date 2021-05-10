@@ -1,5 +1,5 @@
 //
-//  FeedCollectionViewController.swift
+//  GalleryCollectionViewController.swift
 //  Flickr
 //
 //  Created by Daniil Kim on 05.05.2021.
@@ -8,8 +8,7 @@
 import UIKit
 import CoreLocation
 
-class FeedCollectionViewController: UICollectionViewController {
-    
+class GalleryCollectionViewController: UICollectionViewController {
     //MARK: - IB outlets
     
     @IBOutlet weak var searchBar: UISearchBar!
@@ -28,19 +27,21 @@ class FeedCollectionViewController: UICollectionViewController {
     private var page = 1
     private var totalPages = 1
     
+    private var loadingQueue = OperationQueue()
+    private var loadingOperations: [IndexPath: Post] = [:]
+    
     //MARK: - View Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        collectionView.register(UINib(nibName: K.cells.nibName, bundle: nil),
-                                forCellWithReuseIdentifier: K.cells.reuseIdentifier)
+        collectionView.register(PostCollectionViewCell.self, forCellWithReuseIdentifier: K.cells.reuseIdentifier)
+        collectionView.showsVerticalScrollIndicator = false
         
         if tabBarController?.tabBar.selectedItem?.tag == 1 { isSearch = true }
-        
-        navigationController?.navigationBar.isTranslucent = false
         tabBarController?.tabBar.isTranslucent = false
         
+        navigationController?.navigationBar.isTranslucent = false
         
         if isSearch {
             navigationItem.titleView = searchBar
@@ -86,13 +87,9 @@ class FeedCollectionViewController: UICollectionViewController {
                     loadNearbyPosts(on: page)
                 }
             }
-            
         }
-        
+
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: K.cells.reuseIdentifier, for: indexPath) as! PostCollectionViewCell
-        
-        cell.layer.shouldRasterize = true
-        cell.layer.rasterizationScale = UIScreen.main.scale
         
         cell.post = posts[indexPath.row]
         cell.delegate = self
@@ -119,7 +116,6 @@ class FeedCollectionViewController: UICollectionViewController {
                 DispatchQueue.main.async {
                     self.updatePostsAndTotalPages(with: response!)
                 }
-                
             case .failure(let error):
                 print("Failed to get photos: ", error.localizedDescription)
             //show error to user
@@ -164,10 +160,10 @@ class FeedCollectionViewController: UICollectionViewController {
         posts += response.posts
         totalPages = response.totalPages
         
-        let indexPaths = (posts.count - response.posts.count  ..<  posts.count).map {
-            IndexPath(item: $0, section: 0)
+//        print("updating posts from: ",posts.count - response.posts.count," to: ", posts.count)
+        for row in posts.count - response.posts.count  ..<  posts.count {
+            self.collectionView.insertItems(at: [IndexPath(row: row, section: 0)])
         }
-        collectionView.insertItems(at: indexPaths)
     }
     
     private func setLogo() {
@@ -175,9 +171,6 @@ class FeedCollectionViewController: UICollectionViewController {
         
         let logoButton = UIButton(type: .custom)
         logoButton.setImage(logo, for: .normal)
-        let size = CGRect(x: 0, y: 0, width: logo.size.width, height: logo.size.height)
-        logoButton.frame = size
-        logoButton.bounds = size
         logoButton.imageEdgeInsets = .init(top: 0, left: 5, bottom: 10, right: 280)
         logoButton.addTarget(self, action: #selector(scrollToTopAnimated), for: .touchUpInside)
         
@@ -217,11 +210,37 @@ class FeedCollectionViewController: UICollectionViewController {
             searchBar.resignFirstResponder()
         }
     }
+    
+}
+
+//MARK: - Collection View Delegate Flow Layout
+
+extension GalleryCollectionViewController: UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return K.cells.minimumSpacing
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return K.cells.minimumSpacing
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let cellWidth = UIScreen.main.bounds.width / 3 - K.cells.minimumSpacing
+        return CGSize(width: cellWidth, height: cellWidth)
+    }
+    
 }
 
 //MARK: - Location Manager Delegate
 
-extension FeedCollectionViewController: CLLocationManagerDelegate {
+extension GalleryCollectionViewController: CLLocationManagerDelegate {
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
@@ -246,11 +265,12 @@ extension FeedCollectionViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Error getting location: ", error.localizedDescription)
     }
+    
 }
 
 //MARK: - Search Bar Delegate
 
-extension FeedCollectionViewController: UISearchBarDelegate {
+extension GalleryCollectionViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
@@ -259,9 +279,12 @@ extension FeedCollectionViewController: UISearchBarDelegate {
             loadSearchResults(with: tag)
         }
     }
+    
 }
 
-extension FeedCollectionViewController: PostCollectionViewCellDelegate {
+//MARK: - PostCollectionViewCell Delegate
+
+extension GalleryCollectionViewController: PostCollectionViewCellDelegate {
     
     func postCollectionViewCell(cell: PostCollectionViewCell, didTapOn pictureURL: URL) {
         performSegue(withIdentifier: K.segueIdentifiers.showImage, sender: pictureURL)
@@ -273,4 +296,5 @@ extension FeedCollectionViewController: PostCollectionViewCellDelegate {
             imageVC.pictureURL = (sender as! URL)
         }
     }
+    
 }

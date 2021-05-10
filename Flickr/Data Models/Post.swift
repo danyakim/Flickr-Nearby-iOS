@@ -8,16 +8,11 @@
 import UIKit
 
 class Post {
-
-    var title: String!
-   
+    
     var pictureURL: URL!
     var highResPictureURL: URL!
     
-    var user: User!
-    
-    init(title: String, pictureURL: URL, highResURL: URL) {
-        self.title = title
+    init(pictureURL: URL, highResURL: URL) {
         self.pictureURL = pictureURL
         self.highResPictureURL = highResURL
     }

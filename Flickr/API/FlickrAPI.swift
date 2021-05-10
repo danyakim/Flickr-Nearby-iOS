@@ -23,6 +23,7 @@ class FlickrAPI {
     //MARK: - Variables
     
     var uniquePosts = Set<URL>()
+    var cachedPictures = [URL: UIImage]()
     
     //MARK: - Methods
     
@@ -44,7 +45,7 @@ class FlickrAPI {
         search.page = "\(page)"
         search.per_page = "\(K.API.per_page)"
         
-        search.extras = "owner_name, url_m, url_l, url_t, url_s, url_n, url_z, url_c"
+        search.extras = "url_m, url_l, url_t, url_s, url_n, url_z, url_c"
         
         FlickrKit.shared().call(search) { response, error in
             if let error = error {
@@ -77,32 +78,27 @@ class FlickrAPI {
         if photoArray.count == 0 { return nil }
         
         for photo in photoArray {
-            //get post data
-            let title = "\(photo["title"]!)"
-            
-            let availableResolution = photo["url_m"] ?? photo["url_n"] ?? photo["url_s"] ?? photo["url_t"]!
-            let highestAvailableResolution = photo["url_l"] ?? photo["url_c"] ?? photo["url_z"] ?? availableResolution
+            let availableResolution =  photo["url_n"] ??
+                                       photo["url_s"] ??
+                                       photo["url_q"] ??
+                                       photo["url_sq"] ??
+                                       photo["url_t"]!
+            let highestAvailableResolution = photo["url_l"] ??
+                                             photo["url_c"] ??
+                                             photo["url_z"] ??
+                                             photo["url_m"] ??
+                                             availableResolution
             
             let pictureURL = URL(string: "\(availableResolution)")!
             
-            if uniquePosts.insert(pictureURL).inserted == false {
+            if FlickrAPI.shared.uniquePosts.insert(pictureURL).inserted == false {
                 continue
             }
             
             let highResURL = URL(string: "\(highestAvailableResolution)")!
             
-            let post = Post(title: title, pictureURL: pictureURL, highResURL: highResURL)
-            
-            //get user data
-            let username = "\(photo["ownername"]!)"
-            
-            let ownerID = "\(photo["owner"]!)"
-            let iconserver = "\(photo["server"]!)"
-            let iconfarm = "\(photo["farm"]!)"
-            let buddyimageURL = "https://farm\(iconfarm).staticflickr.com/\(iconserver)/buddyicons/\(ownerID).jpg"
-            
-            post.user = User(name: username, photoURL: URL(string: buddyimageURL)!)
-            
+            let post = Post(pictureURL: pictureURL, highResURL: highResURL)
+ 
             result.append(post)
         }
         return (result, totalPages)

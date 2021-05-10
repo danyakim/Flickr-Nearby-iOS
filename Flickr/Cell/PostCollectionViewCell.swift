@@ -13,52 +13,74 @@ protocol PostCollectionViewCellDelegate {
 
 class PostCollectionViewCell: UICollectionViewCell {
     
-    //MARK: - IB Outlets
+    //MARK: - Constants
     
-    
-    @IBOutlet weak var userImage: UIImageView!
-    @IBOutlet weak var userName: UILabel!
-    @IBOutlet weak var picture: UIImageView!
-    @IBOutlet weak var pictureTitle: UILabel!
-    
+    fileprivate let picture: UIImageView = {
+        let iv = UIImageView()
+        
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.contentMode = .scaleAspectFill
+        iv.clipsToBounds = true
+        
+        return iv
+    }()
     
     //MARK: - Variables
     
     var post: Post?
-    
     var delegate: PostCollectionViewCellDelegate?
     
     //MARK: - Methods
     
-    func configure() {
-        userImage.layer.cornerRadius = userImage.bounds.height / 2
+    override init(frame: CGRect) {
+        super.init(frame: .zero)
         
+        contentView.addSubview(picture)
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(showImage))
+        picture.isUserInteractionEnabled = true
+        picture.addGestureRecognizer(tap)
+        
+        picture.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        picture.leftAnchor.constraint(equalTo: contentView.leftAnchor).isActive = true
+        picture.rightAnchor.constraint(equalTo: contentView.rightAnchor).isActive = true
+        picture.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func configure() {
         guard let post = post else {
             print("No data to configure cell with")
             return
         }
         
-        pictureTitle.text = post.title
-        
         configurePicture(for: post)
-        configureUser(for: post)
-        
-        
     }
     
     //MARK: - Helping functions
     
     func configurePicture(for post: Post) {
-        picture.setImage(fromURL: post.pictureURL)
-        
-        let tap = UITapGestureRecognizer(target: self, action: #selector(showImage))
-        picture.isUserInteractionEnabled = true
-        picture.addGestureRecognizer(tap)
-    }
-    
-    func configureUser(for post: Post) {
-        userName.text = post.user.name
-        userImage.setImage(fromURL: post.user.photoURL)
+        DispatchQueue.global().async {
+            var image: UIImage
+            if let cachedImage = FlickrAPI.shared.cachedPictures[post.pictureURL] {
+                image = cachedImage
+                
+            } else {
+                guard let imageData = try? Data(contentsOf: post.pictureURL) else { return }
+                
+                image = UIImage(data: imageData)!
+                DispatchQueue.main.sync {
+                    FlickrAPI.shared.cachedPictures[post.pictureURL] = image
+                }
+
+            }
+            DispatchQueue.main.async {
+                self.picture.image = image
+            }
+        }
     }
     
     @objc func showImage() {
@@ -67,21 +89,3 @@ class PostCollectionViewCell: UICollectionViewCell {
     
 }
 
-//MARK: - Async Image Loading
-
-extension UIImageView {
-    
-    func setImage(fromURL url: URL) {
-        
-        DispatchQueue.global().async {
-            guard let imageData = try? Data(contentsOf: url) else { return }
-            
-            let image = UIImage(data: imageData)
-            
-            DispatchQueue.main.async {
-                self.image = image
-            }
-        }
-    }
-    
-}
