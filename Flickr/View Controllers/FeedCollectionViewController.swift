@@ -57,15 +57,13 @@ class FeedCollectionViewController: UICollectionViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        tabBarController?.tabBar.isHidden = false
-        
         if isSearch && posts.count == 0 {
             searchBar.becomeFirstResponder()
         }
         
-        let red = UIColor(red: 0.96, green: 0.00, blue: 0.46, alpha: 1.00)
-        let blue = UIColor(red: 0.09, green: 0.33, blue: 0.76, alpha: 1.00)
-        tabBarController?.tabBar.tintColor = isSearch ? red : blue
+        tabBarController?.tabBar.isHidden = false
+        tabBarController?.tabBar.tintColor = isSearch ? K.colors.red : K.colors.blue
+        tabBarController?.tabBar.unselectedItemTintColor = isSearch ? K.colors.blueUnselected : K.colors.redUnselected
     }
     
     //MARK: - Collection View Data Source
@@ -75,32 +73,9 @@ class FeedCollectionViewController: UICollectionViewController {
         return posts.count
     }
     
-    override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
-    
     override func collectionView(_ collectionView: UICollectionView,
                                  cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        print("cell for :\(indexPath.row)")
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: K.cells.reuseIdentifier, for: indexPath) as! PostCollectionViewCell
-        
-        cell.layer.shouldRasterize = true
-        cell.layer.rasterizationScale = UIScreen.main.scale
-        
-        cell.post = posts[indexPath.row]
-        cell.delegate = self
-        cell.configure()
-        
-        return cell
-    }
-    
-    //MARK: - Collection View Delegate
-    
-    override func collectionView(_ collectionView: UICollectionView,
-                                 willDisplay cell: UICollectionViewCell,
-                                 forItemAt indexPath: IndexPath) {
-//        print("will display :\(indexPath.row)")
-        if indexPath.row >= posts.count - 2 {
+        if indexPath.row == posts.count - 1 {
             //load next page
             if page < totalPages {
                 page += 1
@@ -113,6 +88,17 @@ class FeedCollectionViewController: UICollectionViewController {
             }
             
         }
+        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: K.cells.reuseIdentifier, for: indexPath) as! PostCollectionViewCell
+        
+        cell.layer.shouldRasterize = true
+        cell.layer.rasterizationScale = UIScreen.main.scale
+        
+        cell.post = posts[indexPath.row]
+        cell.delegate = self
+        cell.configure()
+        
+        return cell
     }
     
     //MARK: - Methods
@@ -131,7 +117,7 @@ class FeedCollectionViewController: UICollectionViewController {
             switch result {
             case .success(let response):
                 DispatchQueue.main.async {
-                    self.updatePostsAndTotalPages(with: response)
+                    self.updatePostsAndTotalPages(with: response!)
                 }
                 
             case .failure(let error):
@@ -158,7 +144,7 @@ class FeedCollectionViewController: UICollectionViewController {
                 DispatchQueue.main.async {
                     if shouldScrollToTop { self.scrollToTop() }
                     
-                    self.updatePostsAndTotalPages(with: response)
+                    self.updatePostsAndTotalPages(with: response!)
                 }
                 
             case .failure(let error):
@@ -174,13 +160,14 @@ class FeedCollectionViewController: UICollectionViewController {
     
     //MARK: - Helping Functions
     
-    private func updatePostsAndTotalPages(with response: ([Post], Int)?) {
-        posts += response!.0
-        totalPages = response!.1
+    private func updatePostsAndTotalPages(with response: (posts: [Post], totalPages: Int)) {
+        posts += response.posts
+        totalPages = response.totalPages
         
-        for row in self.posts.count - K.API.per_page - 1 ..<  self.posts.count {
-            self.collectionView.insertItems(at: [IndexPath(row: row, section: 0)])
+        let indexPaths = (posts.count - response.posts.count  ..<  posts.count).map {
+            IndexPath(item: $0, section: 0)
         }
+        collectionView.insertItems(at: indexPaths)
     }
     
     private func setLogo() {

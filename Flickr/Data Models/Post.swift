@@ -8,7 +8,7 @@
 import UIKit
 
 class Post {
-    
+
     var title: String!
    
     var pictureURL: URL!

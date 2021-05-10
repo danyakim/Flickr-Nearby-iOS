@@ -22,11 +22,14 @@ class FlickrAPI {
     
     //MARK: - Variables
     
-    var cachedUsers = [String: User]()
+    var uniquePosts = Set<URL>()
     
     //MARK: - Methods
     
-    func getPhotos(location: (String, String)? = nil, tag: String? = nil, page: Int, completion: @escaping (Result<([Post], Int)?, Error>) -> ()) {
+    func getPhotos(location: (String, String)? = nil,
+                   tag: String? = nil,
+                   page: Int,
+                   completion: @escaping (Result<(posts: [Post],totalPages: Int)?, Error>) -> ()) {
         
         let search = FKFlickrPhotosSearch()
         
@@ -63,7 +66,7 @@ class FlickrAPI {
     
     //MARK: - Helping Functions
     
-    func parse(_ response: [String: Any]) -> ([Post], Int)? {
+    func parse(_ response: [String: Any]) -> (posts: [Post], totalPages: Int)? {
         var result = [Post]()
         
         let photos = response["photos"] as! [String: AnyObject]
@@ -76,14 +79,15 @@ class FlickrAPI {
         for photo in photoArray {
             //get post data
             let title = "\(photo["title"]!)"
-            if photo["url_m"] == nil {
-                print("no middle res picture")
-            }
             
             let availableResolution = photo["url_m"] ?? photo["url_n"] ?? photo["url_s"] ?? photo["url_t"]!
             let highestAvailableResolution = photo["url_l"] ?? photo["url_c"] ?? photo["url_z"] ?? availableResolution
             
             let pictureURL = URL(string: "\(availableResolution)")!
+            
+            if uniquePosts.insert(pictureURL).inserted == false {
+                continue
+            }
             
             let highResURL = URL(string: "\(highestAvailableResolution)")!
             
@@ -101,7 +105,6 @@ class FlickrAPI {
             
             result.append(post)
         }
-        
         return (result, totalPages)
     }
     

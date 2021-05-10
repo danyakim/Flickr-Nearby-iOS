@@ -31,7 +31,7 @@ class PostCollectionViewCell: UICollectionViewCell {
     //MARK: - Methods
     
     func configure() {
-        userImage.layer.cornerRadius = 30
+        userImage.layer.cornerRadius = userImage.bounds.height / 2
         
         guard let post = post else {
             print("No data to configure cell with")
