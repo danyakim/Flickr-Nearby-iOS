@@ -23,7 +23,6 @@ class FlickrAPI {
     //MARK: - Variables
     
     var uniquePosts = Set<URL>()
-    var cachedPictures = [URL: UIImage]()
     
     //MARK: - Methods
     
@@ -45,7 +44,7 @@ class FlickrAPI {
         search.page = "\(page)"
         search.per_page = "\(K.API.per_page)"
         
-        search.extras = "url_m, url_l, url_t, url_s, url_n, url_z, url_c"
+        search.extras = "url_m, url_l, url_t, url_s, url_n, url_z, url_c, url_q, url_sq"
         
         FlickrKit.shared().call(search) { response, error in
             if let error = error {

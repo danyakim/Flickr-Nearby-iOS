@@ -12,6 +12,7 @@
 		3B12F4D32642B08C008B0ABC /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B12F4D22642B08C008B0ABC /* ImageViewController.swift */; };
 		3B12F4D52642B120008B0ABC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B12F4D42642B120008B0ABC /* Constants.swift */; };
 		3B12F4D82642E13B008B0ABC /* FlickrAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B12F4D72642E13B008B0ABC /* FlickrAPI.swift */; };
+		3B7264B62649F986002157B6 /* LoadPictureOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B7264B52649F986002157B6 /* LoadPictureOperation.swift */; };
 		3BEABAC026429FEA005BA088 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BEABABF26429FEA005BA088 /* AppDelegate.swift */; };
 		3BEABAC226429FEA005BA088 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BEABAC126429FEA005BA088 /* SceneDelegate.swift */; };
 		3BEABAC726429FEA005BA088 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3BEABAC526429FEA005BA088 /* Main.storyboard */; };
@@ -28,6 +29,7 @@
 		3B12F4D22642B08C008B0ABC /* ImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
 		3B12F4D42642B120008B0ABC /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		3B12F4D72642E13B008B0ABC /* FlickrAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlickrAPI.swift; sourceTree = "<group>"; };
+		3B7264B52649F986002157B6 /* LoadPictureOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadPictureOperation.swift; sourceTree = "<group>"; };
 		3BEABABC26429FEA005BA088 /* Flickr.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flickr.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3BEABABF26429FEA005BA088 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3BEABAC126429FEA005BA088 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 			isa = PBXGroup;
 			children = (
 				3B12F4CC2642ACE8008B0ABC /* Post.swift */,
+				3B7264B52649F986002157B6 /* LoadPictureOperation.swift */,
 			);
 			path = "Data Models";
 			sourceTree = "<group>";
@@ -268,6 +271,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3B7264B62649F986002157B6 /* LoadPictureOperation.swift in Sources */,
 				3B12F4CA2642AC6E008B0ABC /* PostCollectionViewCell.swift in Sources */,
 				3BEABAC026429FEA005BA088 /* AppDelegate.swift in Sources */,
 				3B12F4D82642E13B008B0ABC /* FlickrAPI.swift in Sources */,
@@ -426,7 +430,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = F4VVSWVF6W;
 				INFOPLIST_FILE = "Flickr/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -446,8 +450,9 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = F4VVSWVF6W;
+				GCC_OPTIMIZATION_LEVEL = s;
 				INFOPLIST_FILE = "Flickr/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

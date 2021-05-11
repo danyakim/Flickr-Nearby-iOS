@@ -28,13 +28,14 @@ class GalleryCollectionViewController: UICollectionViewController {
     private var totalPages = 1
     
     private var loadingQueue = OperationQueue()
-    private var loadingOperations: [IndexPath: Post] = [:]
+    private var loadingOperations: [IndexPath: LoadPictureOperation] = [:]
     
     //MARK: - View Life cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        collectionView.prefetchDataSource = self
         collectionView.register(PostCollectionViewCell.self, forCellWithReuseIdentifier: K.cells.reuseIdentifier)
         collectionView.showsVerticalScrollIndicator = false
         
@@ -76,9 +77,58 @@ class GalleryCollectionViewController: UICollectionViewController {
     
     override func collectionView(_ collectionView: UICollectionView,
                                  cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: K.cells.reuseIdentifier,
+                                                      for: indexPath) as! PostCollectionViewCell
+        cell.delegate = self
+        
+        return cell
+    }
+    
+    //MARK: - Collection View Delegate
+    
+    override func collectionView(_ collectionView: UICollectionView,
+                                 willDisplay cell: UICollectionViewCell,
+                                 forItemAt indexPath: IndexPath) {
+        //configure cell
+        guard let cell = cell as? PostCollectionViewCell else { return }
+        
+        //use last cell as loading indicator
+        if indexPath.row == posts.count - 1 && page < totalPages {
+            cell.startLoadingAnimation()
+        } else {
+            cell.startLoadingAnimation()
+            
+            let updateCellClosure: (Post) -> () = { [weak self] post in
+                guard let self = self else { return }
+                
+                cell.configure(with: post)
+                self.loadingOperations.removeValue(forKey: indexPath)
+            }
+            
+            if let pictureLoader = loadingOperations[indexPath] {
+                if let loadedPicture = pictureLoader.loadedPicture {
+                    let post = posts[indexPath.row]
+                    post.loadedPicture = loadedPicture
+                    updateCellClosure(post)
+                } else {
+                    pictureLoader.loadingCompletionHandler = updateCellClosure
+                }
+            } else {
+                if let pictureLoader = posts[indexPath.row].loadPicture() {
+                    pictureLoader.loadingCompletionHandler = updateCellClosure
+                    loadingQueue.addOperation(pictureLoader)
+                    loadingOperations[indexPath] = pictureLoader
+                } else {
+                    updateCellClosure(posts[indexPath.row])
+                }
+            }
+        }
+        
+        //change page and load more results
         if indexPath.row == posts.count - 1 {
             //load next page
             if page < totalPages {
+                
                 page += 1
                 
                 if isSearch {
@@ -88,14 +138,17 @@ class GalleryCollectionViewController: UICollectionViewController {
                 }
             }
         }
-
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: K.cells.reuseIdentifier, for: indexPath) as! PostCollectionViewCell
         
-        cell.post = posts[indexPath.row]
-        cell.delegate = self
-        cell.configure()
-        
-        return cell
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView,
+                                 didEndDisplaying cell: UICollectionViewCell,
+                                 forItemAt indexPath: IndexPath) {
+        posts[indexPath.row].loadedPicture = nil
+        if let pictureLoader = loadingOperations[indexPath] {
+            pictureLoader.cancel()
+            loadingOperations.removeValue(forKey: indexPath)
+        }
     }
     
     //MARK: - Methods
@@ -160,9 +213,18 @@ class GalleryCollectionViewController: UICollectionViewController {
         posts += response.posts
         totalPages = response.totalPages
         
-//        print("updating posts from: ",posts.count - response.posts.count," to: ", posts.count)
+        var indexPaths = [IndexPath]()
         for row in posts.count - response.posts.count  ..<  posts.count {
-            self.collectionView.insertItems(at: [IndexPath(row: row, section: 0)])
+            indexPaths.append(IndexPath(row: row, section: 0))
+        }
+        
+        collectionView.insertItems(at: indexPaths)
+        
+        //remove loading indicator from last cell
+        let updatedFromRow = posts.count - response.posts.count - 1
+        if updatedFromRow > 0 {
+            let loadingIndicatorPath = IndexPath(row: updatedFromRow, section: 0)
+            collectionView.reloadItems(at: [loadingIndicatorPath])
         }
     }
     
@@ -177,13 +239,13 @@ class GalleryCollectionViewController: UICollectionViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: logoButton)
     }
     
-    func configureLocationManager() {
+    private func configureLocationManager() {
         locationManager = CLLocationManager()
         locationManager?.delegate = self
         locationManager?.requestWhenInUseAuthorization()
     }
     
-    func hideKeyboardWhenTappedOutside() {
+    private func hideKeyboardWhenTappedOutside() {
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
@@ -204,6 +266,12 @@ class GalleryCollectionViewController: UICollectionViewController {
     @objc func dismissKeyboard() {
         searchBar.resignFirstResponder()
     }
+    
+}
+
+//MARK: - Scroll View Delegate
+
+extension GalleryCollectionViewController {
     
     override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         if isSearch {
@@ -234,6 +302,36 @@ extension GalleryCollectionViewController: UICollectionViewDelegateFlowLayout {
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         let cellWidth = UIScreen.main.bounds.width / 3 - K.cells.minimumSpacing
         return CGSize(width: cellWidth, height: cellWidth)
+    }
+    
+}
+
+//MARK: - Collection View Prefetching
+
+extension GalleryCollectionViewController: UICollectionViewDataSourcePrefetching {
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        prefetchItemsAt indexPaths: [IndexPath]) {
+        for indexPath in indexPaths {
+            if let _ = loadingOperations[indexPath] {
+                continue
+            }
+            
+            if let pictureLoader = posts[indexPath.row].loadPicture() {
+                loadingQueue.addOperation(pictureLoader)
+                loadingOperations[indexPath] = pictureLoader
+            }
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
+        for indexPath in indexPaths {
+            if let pictureLoader = loadingOperations[indexPath] {
+                pictureLoader.cancel()
+                loadingOperations.removeValue(forKey: indexPath)
+            }
+        }
     }
     
 }
@@ -275,7 +373,7 @@ extension GalleryCollectionViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
         
-        if let tag = searchBar.text, !tag.isEmpty{
+        if let tag = searchBar.text, !tag.isEmpty {
             loadSearchResults(with: tag)
         }
     }

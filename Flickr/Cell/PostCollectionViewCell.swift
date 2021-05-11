@@ -15,19 +15,25 @@ class PostCollectionViewCell: UICollectionViewCell {
     
     //MARK: - Constants
     
-    fileprivate let picture: UIImageView = {
-        let iv = UIImageView()
+    private let picture: UIImageView = {
+        let imageView = UIImageView()
         
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        iv.contentMode = .scaleAspectFill
-        iv.clipsToBounds = true
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         
-        return iv
+        return imageView
+    }()
+    
+    private let spinner: UIActivityIndicatorView = {
+        let activityView = UIActivityIndicatorView(style: .large)
+        activityView.hidesWhenStopped = true
+        return activityView
     }()
     
     //MARK: - Variables
     
-    var post: Post?
+    var highResPictureURL: URL?
     var delegate: PostCollectionViewCellDelegate?
     
     //MARK: - Methods
@@ -37,54 +43,50 @@ class PostCollectionViewCell: UICollectionViewCell {
         
         contentView.addSubview(picture)
         
-        let tap = UITapGestureRecognizer(target: self, action: #selector(showImage))
-        picture.isUserInteractionEnabled = true
-        picture.addGestureRecognizer(tap)
-        
         picture.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         picture.leftAnchor.constraint(equalTo: contentView.leftAnchor).isActive = true
         picture.rightAnchor.constraint(equalTo: contentView.rightAnchor).isActive = true
         picture.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        
+        //add tap gesture
+        let tap = UITapGestureRecognizer(target: self, action: #selector(showImage))
+        picture.isUserInteractionEnabled = true
+        picture.addGestureRecognizer(tap)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure() {
-        guard let post = post else {
-            print("No data to configure cell with")
-            return
-        }
+    override func prepareForReuse() {
+        picture.image = nil
+        highResPictureURL = nil
+    }
+    
+    func configure(with post: Post) {
+        highResPictureURL = post.highResPictureURL
         
-        configurePicture(for: post)
+        spinner.stopAnimating()
+        
+        DispatchQueue.main.async {
+            self.picture.image = post.loadedPicture
+        }
+    }
+    
+    func startLoadingAnimation() {
+        spinner.center = CGPoint(x: contentView.bounds.width / 2,
+                                 y: contentView.bounds.height / 2)
+        contentView.insertSubview(spinner, aboveSubview: picture)
+        spinner.startAnimating()
     }
     
     //MARK: - Helping functions
     
-    func configurePicture(for post: Post) {
-        DispatchQueue.global().async {
-            var image: UIImage
-            if let cachedImage = FlickrAPI.shared.cachedPictures[post.pictureURL] {
-                image = cachedImage
-                
-            } else {
-                guard let imageData = try? Data(contentsOf: post.pictureURL) else { return }
-                
-                image = UIImage(data: imageData)!
-                DispatchQueue.main.sync {
-                    FlickrAPI.shared.cachedPictures[post.pictureURL] = image
-                }
-
-            }
-            DispatchQueue.main.async {
-                self.picture.image = image
-            }
-        }
-    }
     
     @objc func showImage() {
-        delegate?.postCollectionViewCell(cell: self, didTapOn: post!.highResPictureURL)
+        guard let pictureURL = highResPictureURL else { return }
+        
+        delegate?.postCollectionViewCell(cell: self, didTapOn: pictureURL)
     }
     
 }
