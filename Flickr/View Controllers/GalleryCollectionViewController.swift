@@ -144,10 +144,12 @@ class GalleryCollectionViewController: UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView,
                                  didEndDisplaying cell: UICollectionViewCell,
                                  forItemAt indexPath: IndexPath) {
-        posts[indexPath.row].loadedPicture = nil
-        if let pictureLoader = loadingOperations[indexPath] {
-            pictureLoader.cancel()
-            loadingOperations.removeValue(forKey: indexPath)
+        if indexPath.row > 0 && indexPath.row < posts.count {
+            posts[indexPath.row].loadedPicture = nil
+            if let pictureLoader = loadingOperations[indexPath] {
+                pictureLoader.cancel()
+                loadingOperations.removeValue(forKey: indexPath)
+            }
         }
     }
     
@@ -171,7 +173,7 @@ class GalleryCollectionViewController: UICollectionViewController {
                 }
             case .failure(let error):
                 print("Failed to get photos: ", error.localizedDescription)
-            //show error to user
+                self.presentAlert(title: "No Results", text: "No photos taken near you :(")
             }
         }
     }
@@ -200,9 +202,10 @@ class GalleryCollectionViewController: UICollectionViewController {
                 DispatchQueue.main.async {
                     self.posts = []
                     self.collectionView.reloadData()
+                    self.presentAlert(title: "Oops",
+                                      text: "No photos tagged: \"\(tag)\"")
                 }
                 print("Failed to get photos: ", error.localizedDescription)
-            //show error to user
             }
         }
     }
@@ -267,6 +270,16 @@ class GalleryCollectionViewController: UICollectionViewController {
         searchBar.resignFirstResponder()
     }
     
+    func presentAlert(title: String, text: String) {
+        let alert = UIAlertController(title: title,
+                                      message: text,
+                                      preferredStyle: .alert)
+        let action = UIAlertAction(title: "Ok",
+                                   style: .default,
+                                   handler: nil)
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
 }
 
 //MARK: - Scroll View Delegate
