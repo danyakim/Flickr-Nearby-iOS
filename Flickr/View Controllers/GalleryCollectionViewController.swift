@@ -30,6 +30,8 @@ class GalleryCollectionViewController: UICollectionViewController {
     private var loadingQueue = OperationQueue()
     private var loadingOperations: [IndexPath: LoadPictureOperation] = [:]
     
+    let flickrAPI = FlickrAPI()
+    
     //MARK: - View Life cycle
     
     override func viewDidLoad() {
@@ -162,7 +164,7 @@ class GalleryCollectionViewController: UICollectionViewController {
             return
         }
         
-        FlickrAPI.shared.getPhotos(location: (lat, lon),
+        flickrAPI.getPhotos(location: (lat, lon),
                                    page: page) { [weak self] result in
             guard let self = self else { return }
             
@@ -180,7 +182,7 @@ class GalleryCollectionViewController: UICollectionViewController {
     
     private func loadSearchResults(with tag: String,
                                    on page: Int = 1) {
-        FlickrAPI.shared.getPhotos(tag: tag, page: page) { [weak self] result in
+        flickrAPI.getPhotos(tag: tag, page: page) { [weak self] result in
             guard let self = self else { return }
             
             switch result {
@@ -254,6 +256,17 @@ class GalleryCollectionViewController: UICollectionViewController {
         view.addGestureRecognizer(tap)
     }
     
+    private func presentAlert(title: String, text: String) {
+        let alert = UIAlertController(title: title,
+                                      message: text,
+                                      preferredStyle: .alert)
+        let action = UIAlertAction(title: "Ok",
+                                   style: .default,
+                                   handler: nil)
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
+    
     @objc func scrollToTopAnimated() {
         collectionView.scrollToItem(at: IndexPath(row: 0, section: 0),
                                     at: .top,
@@ -270,16 +283,6 @@ class GalleryCollectionViewController: UICollectionViewController {
         searchBar.resignFirstResponder()
     }
     
-    func presentAlert(title: String, text: String) {
-        let alert = UIAlertController(title: title,
-                                      message: text,
-                                      preferredStyle: .alert)
-        let action = UIAlertAction(title: "Ok",
-                                   style: .default,
-                                   handler: nil)
-        alert.addAction(action)
-        present(alert, animated: true, completion: nil)
-    }
 }
 
 //MARK: - Scroll View Delegate

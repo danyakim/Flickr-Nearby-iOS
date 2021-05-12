@@ -14,17 +14,15 @@ enum FlickrAPIError: Error {
 
 class FlickrAPI {
     
-    static let shared = FlickrAPI()
-    
-    init() {
-        FlickrKit.shared().initialize(withAPIKey: K.API.flickrAPIKey, sharedSecret: K.API.flickrSecret)
-    }
-    
     //MARK: - Variables
     
     var uniquePosts = Set<URL>()
     
     //MARK: - Methods
+    
+    init() {
+        FlickrKit.shared().initialize(withAPIKey: K.API.flickrAPIKey, sharedSecret: K.API.flickrSecret)
+    }
     
     func getPhotos(location: (String, String)? = nil,
                    tag: String? = nil,
@@ -90,7 +88,7 @@ class FlickrAPI {
             
             let pictureURL = URL(string: "\(availableResolution)")!
             
-            if FlickrAPI.shared.uniquePosts.insert(pictureURL).inserted == false {
+            if uniquePosts.insert(pictureURL).inserted == false {
                 continue
             }
             
