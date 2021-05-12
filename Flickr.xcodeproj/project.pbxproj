@@ -19,6 +19,8 @@
 		3BEABAC926429FEE005BA088 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3BEABAC826429FEE005BA088 /* Assets.xcassets */; };
 		3BEABACC26429FEE005BA088 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3BEABACA26429FEE005BA088 /* LaunchScreen.storyboard */; };
 		3BEABAD82642A49D005BA088 /* GalleryCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BEABAD72642A49D005BA088 /* GalleryCollectionViewController.swift */; };
+		3BEF664A264C0D88006A345A /* PostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BEF6649264C0D88006A345A /* PostViewModel.swift */; };
+		3BEF664C264C2A53006A345A /* PostsDataViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BEF664B264C2A53006A345A /* PostsDataViewModel.swift */; };
 		E44486DC729D0890847DC047 /* Pods_Flickr.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86C9E5A7D6A40A35064B31C0 /* Pods_Flickr.framework */; };
 /* End PBXBuildFile section */
 
@@ -37,7 +39,9 @@
 		3BEABAC826429FEE005BA088 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3BEABACB26429FEE005BA088 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3BEABACD26429FEE005BA088 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3BEABAD72642A49D005BA088 /* GalleryCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GalleryCollectionViewController.swift; path = "Flickr/View Controllers/GalleryCollectionViewController.swift"; sourceTree = SOURCE_ROOT; };
+		3BEABAD72642A49D005BA088 /* GalleryCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryCollectionViewController.swift; sourceTree = "<group>"; };
+		3BEF6649264C0D88006A345A /* PostViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostViewModel.swift; sourceTree = "<group>"; };
+		3BEF664B264C2A53006A345A /* PostsDataViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostsDataViewModel.swift; sourceTree = "<group>"; };
 		86C9E5A7D6A40A35064B31C0 /* Pods_Flickr.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Flickr.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7AE407B8C2AF2EB586A82D6 /* Pods-Flickr.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Flickr.debug.xcconfig"; path = "Target Support Files/Pods-Flickr/Pods-Flickr.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -62,12 +66,12 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		3B12F4C72642AC14008B0ABC /* Cell */ = {
+		3B12F4C72642AC14008B0ABC /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				3B12F4C82642AC6E008B0ABC /* PostCollectionViewCell.swift */,
 			);
-			path = Cell;
+			path = Views;
 			sourceTree = "<group>";
 		};
 		3B12F4D62642E110008B0ABC /* API */ = {
@@ -102,9 +106,10 @@
 				3BEABABF26429FEA005BA088 /* AppDelegate.swift */,
 				3BEABAC126429FEA005BA088 /* SceneDelegate.swift */,
 				3B12F4D62642E110008B0ABC /* API */,
-				3BEABAD62642A09E005BA088 /* Data Models */,
-				3B12F4C72642AC14008B0ABC /* Cell */,
-				3BEABAD52642A094005BA088 /* View Controllers */,
+				3BEABAD62642A09E005BA088 /* Models */,
+				3B12F4C72642AC14008B0ABC /* Views */,
+				3BEF6648264C0D6F006A345A /* View Models */,
+				3BEABAD52642A094005BA088 /* Controllers */,
 				3BEABAD42642A083005BA088 /* Resources */,
 				3BEABAD32642A05A005BA088 /* Supporting Files */,
 			);
@@ -130,22 +135,31 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		3BEABAD52642A094005BA088 /* View Controllers */ = {
+		3BEABAD52642A094005BA088 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
 				3BEABAD72642A49D005BA088 /* GalleryCollectionViewController.swift */,
 				3B12F4D22642B08C008B0ABC /* ImageViewController.swift */,
 			);
-			path = "View Controllers";
+			path = Controllers;
 			sourceTree = "<group>";
 		};
-		3BEABAD62642A09E005BA088 /* Data Models */ = {
+		3BEABAD62642A09E005BA088 /* Models */ = {
 			isa = PBXGroup;
 			children = (
 				3B12F4CC2642ACE8008B0ABC /* Post.swift */,
 				3B7264B52649F986002157B6 /* LoadPictureOperation.swift */,
 			);
-			path = "Data Models";
+			path = Models;
+			sourceTree = "<group>";
+		};
+		3BEF6648264C0D6F006A345A /* View Models */ = {
+			isa = PBXGroup;
+			children = (
+				3BEF6649264C0D88006A345A /* PostViewModel.swift */,
+				3BEF664B264C2A53006A345A /* PostsDataViewModel.swift */,
+			);
+			path = "View Models";
 			sourceTree = "<group>";
 		};
 		57BCFBAEA5EABDB1E07D38C1 /* Pods */ = {
@@ -271,8 +285,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3BEF664A264C0D88006A345A /* PostViewModel.swift in Sources */,
 				3B7264B62649F986002157B6 /* LoadPictureOperation.swift in Sources */,
 				3B12F4CA2642AC6E008B0ABC /* PostCollectionViewCell.swift in Sources */,
+				3BEF664C264C2A53006A345A /* PostsDataViewModel.swift in Sources */,
 				3BEABAC026429FEA005BA088 /* AppDelegate.swift in Sources */,
 				3B12F4D82642E13B008B0ABC /* FlickrAPI.swift in Sources */,
 				3B12F4D32642B08C008B0ABC /* ImageViewController.swift in Sources */,

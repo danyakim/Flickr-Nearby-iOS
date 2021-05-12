@@ -13,7 +13,7 @@ protocol PostCollectionViewCellDelegate {
 
 class PostCollectionViewCell: UICollectionViewCell {
     
-    //MARK: - Constants
+    //MARK: - UIViews
     
     private let picture: UIImageView = {
         let imageView = UIImageView()
@@ -63,13 +63,13 @@ class PostCollectionViewCell: UICollectionViewCell {
         highResPictureURL = nil
     }
     
-    func configure(with post: Post) {
-        highResPictureURL = post.highResPictureURL
+    func configure(with postViewModel: PostViewModel) {
+        highResPictureURL = postViewModel.highResURL
         
         spinner.stopAnimating()
         
         DispatchQueue.main.async {
-            self.picture.image = post.loadedPicture
+            self.picture.image = postViewModel.loadedPicture
         }
     }
     

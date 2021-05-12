@@ -10,27 +10,29 @@ import UIKit
 class LoadPictureOperation: Operation {
     
     var loadedPicture: UIImage?
-    var loadingCompletionHandler: ((Post) -> ())?
+    var loadingCompletionHandler: ((PostViewModel) -> ())?
     
-    let post: Post
+    var postViewModel: PostViewModel
     
-    init(_ post: Post) {
-        self.post = post
+    init(_ postViewModel: PostViewModel) {
+        self.postViewModel = postViewModel
     }
     
     override func main() {
         if isCancelled { return }
         
         var image: UIImage
-        guard let imageData = try? Data(contentsOf: post.pictureURL) else { return }
+        guard let imageData = try? Data(contentsOf: postViewModel.pictureURL) else { return }
         image = UIImage(data: imageData)!
         
         loadedPicture = image
-        post.loadedPicture = loadedPicture
+        postViewModel.loadedPicture = image
+        
+        if isCancelled { return }
         
         if let loadingCompletionHandler = loadingCompletionHandler {
             DispatchQueue.main.async {
-                loadingCompletionHandler(self.post)
+                loadingCompletionHandler(self.postViewModel)
             }
         }
     }
