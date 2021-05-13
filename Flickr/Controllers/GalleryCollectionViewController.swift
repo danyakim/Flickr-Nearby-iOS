@@ -297,7 +297,7 @@ extension GalleryCollectionViewController: PostCollectionViewCellDelegate {
 
 extension GalleryCollectionViewController: PostsDataViewModelDelegate {
     
-    func postsDataViewModel(didAddNewPostsAt indexPaths: [IndexPath], totalPages: Int, _ tag: String?) {
+    func postsDataViewModel(didAddNewPostsAt indexPaths: [IndexPath], totalPages: Int) {
         if postsViewModel.shouldScrollToTop { scrollToTop() }
         
         self.totalPages = totalPages

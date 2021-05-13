@@ -95,7 +95,7 @@ class FlickrAPI {
                     let post = Post(pictureURL: pictureURL, highResURL: highResURL)
                     
                     result.append(post)
-                }
+                } else { return nil }
             }
             return (result, totalPages)
         }

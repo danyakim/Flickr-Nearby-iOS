@@ -8,7 +8,7 @@
 import Foundation
 
 protocol PostsDataViewModelDelegate {
-    func postsDataViewModel(didAddNewPostsAt indexPaths: [IndexPath], totalPages: Int, _ tag: String?)
+    func postsDataViewModel(didAddNewPostsAt indexPaths: [IndexPath], totalPages: Int)
     func postsDataViewModelFailedToGetPosts(with tag: String?)
 }
 
@@ -155,8 +155,7 @@ class PostsDataViewModel {
         postViewModels += newPosts.map({ PostViewModel($0) })
         
         delegate?.postsDataViewModel(didAddNewPostsAt: indexPaths,
-                                     totalPages: response.totalPages,
-                                     tag)
+                                     totalPages: response.totalPages)
     }
     
 }

@@ -83,7 +83,6 @@ class ImageViewController: UIViewController,
             
             imageView.contentMode = .scaleAspectFit
             imageView.isUserInteractionEnabled = true
-            
         }
     }
     
