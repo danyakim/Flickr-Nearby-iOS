@@ -9,8 +9,8 @@ import Foundation
 import UIKit
 
 protocol PostsDataVMDelegate {
-    func postsDataViewModelAddedNewPosts(count: Int, totalPages: Int)
-    func postsDataViewModelFailedToGetPosts(with tag: String?)
+    func postsDataVMAddedNewPosts(count: Int, totalPages: Int)
+    func postsDataVMFailedToGetPosts(with tag: String?)
 }
 
 class PostsDataVM {
@@ -49,7 +49,7 @@ class PostsDataVM {
             case .failure(let error):
                 print("Failed to get photos: ", error.localizedDescription)
                 DispatchQueue.main.async {
-                    self.delegate?.postsDataViewModelFailedToGetPosts(with: nil)
+                    self.delegate?.postsDataVMFailedToGetPosts(with: nil)
                 }
             }
             
@@ -74,7 +74,7 @@ class PostsDataVM {
             case .failure(let error):
                 self.posts = []
                 DispatchQueue.main.async {
-                    self.delegate?.postsDataViewModelFailedToGetPosts(with: tag)
+                    self.delegate?.postsDataVMFailedToGetPosts(with: tag)
                 }
                 print("Failed to get photos: ", error.localizedDescription)
             }
@@ -111,7 +111,7 @@ class PostsDataVM {
                                            with tag: String? = nil) {
         let newPosts = response.posts
         posts += newPosts
-        delegate?.postsDataViewModelAddedNewPosts(count: newPosts.count,
+        delegate?.postsDataVMAddedNewPosts(count: newPosts.count,
                                      totalPages: response.totalPages)
     }
     

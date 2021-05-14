@@ -48,28 +48,26 @@ class ImageVC: UIViewController,
         scrollView.minimumZoomScale = 1
         scrollView.maximumZoomScale = 5
         
-        scrollView.addSubview(imageView)
         scrollView.pinTo(view)
+        scrollView.addSubview(imageView)
         
         imageView.pinTo(scrollView, width: scrollView.widthAnchor, height: scrollView.heightAnchor)
+        imageView.contentMode = .scaleAspectFit
+        imageView.isUserInteractionEnabled = true
         
         configureImage()
     }
     
     func configureImage() {
-        if let pictureURL = pictureURL {
-            
-            do {
-                let imageData = try Data(contentsOf: pictureURL)
-                DispatchQueue.main.async {
-                    self.imageView.image = UIImage(data: imageData)
-                }
-            } catch {
-                print("Couldn't load picture data: ",error.localizedDescription)
+        guard let pictureURL = pictureURL else { return }
+        
+        do {
+            let imageData = try Data(contentsOf: pictureURL)
+            DispatchQueue.main.async {
+                self.imageView.image = UIImage(data: imageData)
             }
-            
-            imageView.contentMode = .scaleAspectFit
-            imageView.isUserInteractionEnabled = true
+        } catch {
+            print("Couldn't load picture data: ",error.localizedDescription)
         }
     }
     

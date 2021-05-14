@@ -300,7 +300,7 @@ extension GalleryCollectionVC: PostCollectionViewCellDelegate {
 
 extension GalleryCollectionVC: PostsDataVMDelegate {
     
-    func postsDataViewModelAddedNewPosts(count: Int, totalPages: Int) {
+    func postsDataVMAddedNewPosts(count: Int, totalPages: Int) {
         if postsViewModel.shouldScrollToTop { scrollToTop() }
         
         self.totalPages = totalPages
@@ -320,7 +320,7 @@ extension GalleryCollectionVC: PostsDataVMDelegate {
         }
     }
     
-    func postsDataViewModelFailedToGetPosts(with tag: String? ) {
+    func postsDataVMFailedToGetPosts(with tag: String? ) {
         if let tag = tag {
             self.collectionView.reloadData()
             self.presentAlert(title: "Oops",

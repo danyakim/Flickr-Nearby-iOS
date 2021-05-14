@@ -41,7 +41,6 @@ class PostCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
 
         contentView.addSubview(picture)
-
         picture.pinTo(contentView)
 
         //add tap gesture
@@ -76,7 +75,6 @@ class PostCollectionViewCell: UICollectionViewCell {
     }
     
     //MARK: - Helping functions
-    
     
     @objc func showImage() {
         guard let pictureURL = highResPictureURL else { return }

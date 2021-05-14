@@ -86,11 +86,13 @@ class FlickrAPI {
                 photo["url_q"] ??
                 photo["url_sq"] ??
                 photo["url_t"] else { continue }
+            
             let highestAvailableResolution = photo["url_l"] ??
                 photo["url_c"] ??
                 photo["url_z"] ??
                 photo["url_m"] ??
                 availableResolution
+            
             guard let pictureURL = URL(string: availableResolution as? String ?? ""),
                   let highResURL = URL(string: highestAvailableResolution as? String ?? "") else { continue }
             
