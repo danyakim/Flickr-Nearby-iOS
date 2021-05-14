@@ -750,7 +750,7 @@
 		9BDA9666C834700F1478BC5BB8E5C330 /* FKFlickrPhotosetsCommentsGetList.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FKFlickrPhotosetsCommentsGetList.m; path = Classes/Model/Generated/Photosets/Comments/FKFlickrPhotosetsCommentsGetList.m; sourceTree = "<group>"; };
 		9CC53BED830E18E17DEC6B8346020D80 /* FKFlickrGalleriesAddPhoto.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FKFlickrGalleriesAddPhoto.h; path = Classes/Model/Generated/Galleries/FKFlickrGalleriesAddPhoto.h; sourceTree = "<group>"; };
 		9D1A60D0327082D78005E72E5400F275 /* FKFlickrFavoritesAdd.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FKFlickrFavoritesAdd.m; path = Classes/Model/Generated/Favorites/FKFlickrFavoritesAdd.m; sourceTree = "<group>"; };
-		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		9D9BE7ABCF3B39D1DF8BB603C4C9AC8A /* FKFlickrStatsGetPhotostreamDomains.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FKFlickrStatsGetPhotostreamDomains.h; path = Classes/Model/Generated/Stats/FKFlickrStatsGetPhotostreamDomains.h; sourceTree = "<group>"; };
 		9E298E3116BA23AA9DDACCC66A69E14B /* FKFlickrPrefsGetContentType.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FKFlickrPrefsGetContentType.m; path = Classes/Model/Generated/Prefs/FKFlickrPrefsGetContentType.m; sourceTree = "<group>"; };
 		9E5481D5113E0F49518913678BD8FD22 /* FKFlickrPhotosGetNotInSet.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FKFlickrPhotosGetNotInSet.m; path = Classes/Model/Generated/Photos/FKFlickrPhotosGetNotInSet.m; sourceTree = "<group>"; };
@@ -760,9 +760,9 @@
 		9FE401F8BEDC272764BF8D701A359AF7 /* FKFlickrStatsGetPhotostreamStats.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FKFlickrStatsGetPhotostreamStats.m; path = Classes/Model/Generated/Stats/FKFlickrStatsGetPhotostreamStats.m; sourceTree = "<group>"; };
 		A044827FD46037565158F333B6B65783 /* FKFlickrPhotosSuggestionsRemoveSuggestion.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FKFlickrPhotosSuggestionsRemoveSuggestion.m; path = Classes/Model/Generated/Photos/Suggestions/FKFlickrPhotosSuggestionsRemoveSuggestion.m; sourceTree = "<group>"; };
 		A0E5154374CF0836F0927B0D872AB262 /* FKDUNetworkController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FKDUNetworkController.m; path = Classes/DevedUpKit/FKDUNetworkController.m; sourceTree = "<group>"; };
-		A0F34AC37AC18566E8F93F7A304792D2 /* Pods_Flickr.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_Flickr.framework; path = "Pods-Flickr.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0F34AC37AC18566E8F93F7A304792D2 /* Pods_Flickr.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Flickr.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20516FEBDC667FDD9B9F73A5BA71236 /* FKFlickrTestLogin.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FKFlickrTestLogin.m; path = Classes/Model/Generated/Test/FKFlickrTestLogin.m; sourceTree = "<group>"; };
-		A369AF6C5672066DEB9E8E77996A34FC /* FlickrKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = FlickrKit.framework; path = FlickrKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A369AF6C5672066DEB9E8E77996A34FC /* FlickrKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FlickrKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A370ABCEA8DF0B20E6DE440DF7915BA8 /* FKDUNetworkOperation.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FKDUNetworkOperation.m; path = Classes/DevedUpKit/FKDUNetworkOperation.m; sourceTree = "<group>"; };
 		A3E118A7DD0C9416C7158FAE244493FB /* FKFlickrStatsGetPhotostreamReferrers.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = FKFlickrStatsGetPhotostreamReferrers.m; path = Classes/Model/Generated/Stats/FKFlickrStatsGetPhotostreamReferrers.m; sourceTree = "<group>"; };
 		A3E66BAA6BA42055EFB579105ACBE978 /* FKFlickrBlogsPostPhoto.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = FKFlickrBlogsPostPhoto.h; path = Classes/Model/Generated/Blogs/FKFlickrBlogsPostPhoto.h; sourceTree = "<group>"; };
@@ -1442,7 +1442,6 @@
 				DA021A3E1D0C855872E7D77D8CF536D9 /* FlickrKit.m */,
 				F147AF8DBC53EF387091E0E297E6206B /* Support Files */,
 			);
-			name = FlickrKit;
 			path = FlickrKit;
 			sourceTree = "<group>";
 		};
@@ -1797,7 +1796,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1100;
-				LastUpgradeCheck = 1100;
+				LastUpgradeCheck = 1250;
 			};
 			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
 			compatibilityVersion = "Xcode 10.0";
@@ -2139,7 +2138,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -2168,7 +2167,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = "Target Support Files/Pods-Flickr/Pods-Flickr-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2240,7 +2239,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2268,7 +2267,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = "Target Support Files/Pods-Flickr/Pods-Flickr-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2304,7 +2303,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/FlickrKit/FlickrKit-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/FlickrKit/FlickrKit-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2338,7 +2337,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/FlickrKit/FlickrKit-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/FlickrKit/FlickrKit-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

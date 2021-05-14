@@ -13,10 +13,9 @@ class GalleryCollectionViewController: UICollectionViewController {
     
     @IBOutlet weak var searchBar: UISearchBar!
     
-    //MARK: - Variables
+    //MARK: - Properties
     
     private var isSearch = false
-    private var previousSearch: String?
     
     private var locationManager: CLLocationManager?
     private var coordinates: (lat: String, lon: String)?
@@ -38,15 +37,13 @@ class GalleryCollectionViewController: UICollectionViewController {
         collectionView.showsVerticalScrollIndicator = false
         
         if tabBarController?.tabBar.selectedItem?.tag == 1 { isSearch = true }
-        tabBarController?.tabBar.isTranslucent = false
         
+        tabBarController?.tabBar.isTranslucent = false
         navigationController?.navigationBar.isTranslucent = false
         
         if isSearch {
-            navigationItem.titleView = searchBar
-            
             searchBar.delegate = self
-            
+            navigationItem.titleView = searchBar
             hideKeyboardWhenTappedOutside()
         } else {
             setLogo()
@@ -96,23 +93,19 @@ class GalleryCollectionViewController: UICollectionViewController {
         //continue loading animation until more posts are loaded
         if isLastCell { return }
         
-        let updateCellClosure: (PostViewModel) -> () = { [weak self] postViewModel in
-            guard let self = self else { return }
-            
-            cell.configure(with: postViewModel)
-            self.postsViewModel.removeLoadingOperation(for: indexPath)
+        let updateCellClosure: (UIImage?, URL) -> () = { image, url in
+            cell.configure(image: image, highResolutionURL: url)
         }
-        postsViewModel.loadImageForPost(at: indexPath,
+        postsViewModel.loadImageForPost(at: indexPath.row,
                                         loadingCompletion: updateCellClosure)
         
         //change page and load more results
-        
         if indexPath.row == postsViewModel.count() - 2 {
             if page < totalPages {
                 page += 1
                 
                 if isSearch {
-                    postsViewModel.loadPosts(tagged: searchBar.text!, on: page)
+                    postsViewModel.loadPosts(tagged: postsViewModel.previousSearch, on: page)
                 } else {
                     postsViewModel.loadPosts(near: coordinates, on: page)
                 }
@@ -124,15 +117,13 @@ class GalleryCollectionViewController: UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView,
                                  didEndDisplaying cell: UICollectionViewCell,
                                  forItemAt indexPath: IndexPath) {
-        if indexPath.row > 0 && indexPath.row < postsViewModel.count() {
-            postsViewModel.cancelLoadingForPost(at: indexPath)
-        }
+        postsViewModel.cancelLoadingForPost(at: indexPath.row)
     }
     
-    //MARK: - Methods
+    //MARK: - Private Methods
     
     private func setLogo() {
-        let logo = UIImage(named: K.imageNames.flickrLogo)!
+        let logo = UIImage(named: K.imageNames.flickrLogo)
         
         let logoButton = UIButton(type: .custom)
         logoButton.setImage(logo, for: .normal)
@@ -146,6 +137,10 @@ class GalleryCollectionViewController: UICollectionViewController {
         locationManager = CLLocationManager()
         locationManager?.delegate = self
         locationManager?.requestWhenInUseAuthorization()
+    }
+    
+    private func configureCollectionView() {
+        
     }
     
     private func hideKeyboardWhenTappedOutside() {
@@ -165,19 +160,24 @@ class GalleryCollectionViewController: UICollectionViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    @objc func scrollToTopAnimated() {
+    //MARK: - Selectors
+    
+    @objc
+    private func scrollToTopAnimated() {
         collectionView.scrollToItem(at: IndexPath(row: 0, section: 0),
                                     at: .top,
                                     animated: true)
     }
     
-    @objc func scrollToTop() {
+    @objc
+    private func scrollToTop() {
         collectionView.scrollToItem(at: IndexPath(row: 0, section: 0),
                                     at: .top,
                                     animated: false)
     }
     
-    @objc func dismissKeyboard() {
+    @objc
+    private func dismissKeyboard() {
         searchBar.resignFirstResponder()
     }
     
@@ -226,12 +226,12 @@ extension GalleryCollectionViewController: UICollectionViewDataSourcePrefetching
     
     func collectionView(_ collectionView: UICollectionView,
                         prefetchItemsAt indexPaths: [IndexPath]) {
-        postsViewModel.prefetchPosts(at: indexPaths)
+        postsViewModel.prefetchPosts(at: indexPaths.map({ $0.row }))
     }
     
     func collectionView(_ collectionView: UICollectionView,
                         cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
-        postsViewModel.cancelPrefetching(at: indexPaths)
+        postsViewModel.cancelPrefetchingPosts(at: indexPaths.map({ $0.row }))
     }
     
 }
@@ -297,16 +297,22 @@ extension GalleryCollectionViewController: PostCollectionViewCellDelegate {
 
 extension GalleryCollectionViewController: PostsDataViewModelDelegate {
     
-    func postsDataViewModel(didAddNewPostsAt indexPaths: [IndexPath], totalPages: Int) {
+    func postsDataViewModelAddedNewPosts(count: Int, totalPages: Int) {
         if postsViewModel.shouldScrollToTop { scrollToTop() }
         
         self.totalPages = totalPages
+        
+        //insert new posts
+        let lastIndexBeforeUpdate = postsViewModel.count() - count
+        var indexPaths = [IndexPath]()
+        for row in lastIndexBeforeUpdate ..< postsViewModel.count() {
+            indexPaths.append(IndexPath(row: row, section: 0))
+        }
         collectionView.insertItems(at: indexPaths)
         
         //remove loading indicator from last cell
-        let updatedFromRow = postsViewModel.count() - indexPaths.count - 1
-        if updatedFromRow > 0 {
-            let loadingIndicatorPath = IndexPath(row: updatedFromRow, section: 0)
+        if lastIndexBeforeUpdate > 0 {
+            let loadingIndicatorPath = IndexPath(row: lastIndexBeforeUpdate - 1, section: 0)
             collectionView.reloadItems(at: [loadingIndicatorPath])
         }
     }
@@ -317,7 +323,8 @@ extension GalleryCollectionViewController: PostsDataViewModelDelegate {
             self.presentAlert(title: "Oops",
                               text: "No photos tagged: \"\(tag)\"")
         } else {
-            self.presentAlert(title: "No Results", text: "No photos taken near you :(")
+            self.presentAlert(title: "No Results",
+                              text: "No photos taken near you :(")
         }
     }
     

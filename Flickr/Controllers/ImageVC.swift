@@ -15,7 +15,7 @@ class ImageViewController: UIViewController,
     let scrollView = UIScrollView()
     let imageView = UIImageView()
     
-    //MARK: - Variables
+    //MARK: - Properties
     
     var pictureURL: URL?
     
@@ -41,30 +41,17 @@ class ImageViewController: UIViewController,
     func setupScrollView() {
         view.addSubview(scrollView)
         
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.delegate = self
         
         scrollView.showsVerticalScrollIndicator = false
         scrollView.showsHorizontalScrollIndicator = false
-        
         scrollView.minimumZoomScale = 1
         scrollView.maximumZoomScale = 5
         
-        scrollView.delegate = self
         scrollView.addSubview(imageView)
+        scrollView.pinTo(view)
         
-        scrollView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-        scrollView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-        scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        
-        imageView.leftAnchor.constraint(equalTo: scrollView.leftAnchor).isActive = true
-        imageView.rightAnchor.constraint(equalTo: scrollView.rightAnchor).isActive = true
-        imageView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
-        imageView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
-        imageView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
-        imageView.heightAnchor.constraint(equalTo: scrollView.heightAnchor).isActive = true
-        imageView.center = scrollView.center
+        imageView.pinTo(scrollView, width: scrollView.widthAnchor, height: scrollView.heightAnchor)
         
         configureImage()
     }

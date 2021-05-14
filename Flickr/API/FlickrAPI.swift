@@ -11,11 +11,12 @@ import FlickrKit
 enum FlickrAPIError: Error {
     case noResults
     case noResponse
+    case noTag
 }
 
 class FlickrAPI {
     
-    //MARK: - Variables
+    //MARK: - Properties
     
     var uniquePosts = Set<URL>()
     
@@ -37,7 +38,12 @@ class FlickrAPI {
             search.lon = location.1
             search.radius = "1"
         } else {
-            search.tags = tag!
+            guard let tag = tag else {
+                completion(.failure(FlickrAPIError.noTag))
+                return
+            }
+            
+            search.tags = tag
         }
         
         search.page = "\(page)"
@@ -69,37 +75,31 @@ class FlickrAPI {
     func parse(_ response: [String: Any]) -> (posts: [Post], totalPages: Int)? {
         var result = [Post]()
         
-        if let photos = response["photos"] as? [String: Any],
-           let totalPages = photos["pages"] as? Int,
-           let photoArray = photos["photo"] as? [[String: Any]],
-           photoArray.count != 0 {
+        guard let photos = response["photos"] as? [String: Any],
+              let totalPages = photos["pages"] as? Int,
+              let photoArray = photos["photo"] as? [[String: Any]],
+              photoArray.count != 0 else { return nil }
+        
+        for photo in photoArray {
+            guard let availableResolution = photo["url_n"] ??
+                photo["url_s"] ??
+                photo["url_q"] ??
+                photo["url_sq"] ??
+                photo["url_t"] else { continue }
+            let highestAvailableResolution = photo["url_l"] ??
+                photo["url_c"] ??
+                photo["url_z"] ??
+                photo["url_m"] ??
+                availableResolution
+            guard let pictureURL = URL(string: availableResolution as? String ?? ""),
+                  let highResURL = URL(string: highestAvailableResolution as? String ?? "") else { continue }
             
-            for photo in photoArray {
-                let availableResolution = photo["url_n"] ??
-                    photo["url_s"] ??
-                    photo["url_q"] ??
-                    photo["url_sq"] ??
-                    photo["url_t"]!
-                let highestAvailableResolution = photo["url_l"] ??
-                    photo["url_c"] ??
-                    photo["url_z"] ??
-                    photo["url_m"] ??
-                    availableResolution
-                if let pictureURL = URL(string: availableResolution as? String ?? ""),
-                   let highResURL = URL(string: highestAvailableResolution as? String ?? "") {
-                    
-                    if uniquePosts.insert(pictureURL).inserted == false {
-                        continue
-                    }
-                    
-                    let post = Post(pictureURL: pictureURL, highResURL: highResURL)
-                    
-                    result.append(post)
-                } else { return nil }
-            }
-            return (result, totalPages)
+            if uniquePosts.insert(pictureURL).inserted == false { continue }
+            
+            let post = Post(pictureURL: pictureURL, highResURL: highResURL)
+            result.append(post)
         }
-        return nil
+        return (result, totalPages)
     }
     
 }

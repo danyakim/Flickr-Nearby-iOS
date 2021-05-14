@@ -18,7 +18,6 @@ class PostCollectionViewCell: UICollectionViewCell {
     private let picture: UIImageView = {
         let imageView = UIImageView()
         
-        imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         
@@ -31,7 +30,7 @@ class PostCollectionViewCell: UICollectionViewCell {
         return activityView
     }()
     
-    //MARK: - Variables
+    //MARK: - Properties
     
     var highResPictureURL: URL?
     var delegate: PostCollectionViewCellDelegate?
@@ -39,14 +38,11 @@ class PostCollectionViewCell: UICollectionViewCell {
     //MARK: - Methods
     
     override init(frame: CGRect) {
-        super.init(frame: .zero)
+        super.init(frame: frame)
         
         contentView.addSubview(picture)
         
-        picture.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        picture.leftAnchor.constraint(equalTo: contentView.leftAnchor).isActive = true
-        picture.rightAnchor.constraint(equalTo: contentView.rightAnchor).isActive = true
-        picture.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        picture.pinTo(contentView)
         
         //add tap gesture
         let tap = UITapGestureRecognizer(target: self, action: #selector(showImage))
@@ -63,13 +59,13 @@ class PostCollectionViewCell: UICollectionViewCell {
         highResPictureURL = nil
     }
     
-    func configure(with postViewModel: PostViewModel) {
-        highResPictureURL = postViewModel.highResURL
+    func configure(image picture: UIImage?, highResolutionURL: URL) {
+        highResPictureURL = highResolutionURL
         
         spinner.stopAnimating()
         
         DispatchQueue.main.async {
-            self.picture.image = postViewModel.loadedPicture
+            self.picture.image = picture
         }
     }
     
