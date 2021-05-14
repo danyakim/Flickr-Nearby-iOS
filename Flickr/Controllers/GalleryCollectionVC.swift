@@ -1,17 +1,21 @@
 //
-//  GalleryCollectionViewController.swift
+//  GalleryCollectionVC.swift
 //  Flickr
 //
 //  Created by Daniil Kim on 05.05.2021.
 //
 
+import Foundation
 import UIKit
 import CoreLocation
 
-class GalleryCollectionViewController: UICollectionViewController {
-    //MARK: - IB outlets
+class GalleryCollectionVC: UICollectionViewController {
+    //MARK: - Views
     
-    @IBOutlet weak var searchBar: UISearchBar!
+    lazy var searchBar: UISearchBar = {
+        let searchBar = UISearchBar()
+        return searchBar
+    }()
     
     //MARK: - Properties
     
@@ -23,7 +27,7 @@ class GalleryCollectionViewController: UICollectionViewController {
     private var page = 1
     private var totalPages = 1
     
-    private var postsViewModel = PostsDataViewModel()
+    private var postsViewModel = PostsDataVM()
     
     //MARK: - View Life cycle
     
@@ -38,7 +42,6 @@ class GalleryCollectionViewController: UICollectionViewController {
         
         if tabBarController?.tabBar.selectedItem?.tag == 1 { isSearch = true }
         
-        tabBarController?.tabBar.isTranslucent = false
         navigationController?.navigationBar.isTranslucent = false
         
         if isSearch {
@@ -185,7 +188,7 @@ class GalleryCollectionViewController: UICollectionViewController {
 
 //MARK: - Scroll View Delegate
 
-extension GalleryCollectionViewController {
+extension GalleryCollectionVC {
     
     override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         if isSearch {
@@ -197,7 +200,7 @@ extension GalleryCollectionViewController {
 
 //MARK: - Collection View Delegate Flow Layout
 
-extension GalleryCollectionViewController: UICollectionViewDelegateFlowLayout {
+extension GalleryCollectionVC: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
@@ -222,7 +225,7 @@ extension GalleryCollectionViewController: UICollectionViewDelegateFlowLayout {
 
 //MARK: - Collection View Prefetching
 
-extension GalleryCollectionViewController: UICollectionViewDataSourcePrefetching {
+extension GalleryCollectionVC: UICollectionViewDataSourcePrefetching {
     
     func collectionView(_ collectionView: UICollectionView,
                         prefetchItemsAt indexPaths: [IndexPath]) {
@@ -238,7 +241,7 @@ extension GalleryCollectionViewController: UICollectionViewDataSourcePrefetching
 
 //MARK: - Location Manager Delegate
 
-extension GalleryCollectionViewController: CLLocationManagerDelegate {
+extension GalleryCollectionVC: CLLocationManagerDelegate {
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
@@ -268,7 +271,7 @@ extension GalleryCollectionViewController: CLLocationManagerDelegate {
 
 //MARK: - Search Bar Delegate
 
-extension GalleryCollectionViewController: UISearchBarDelegate {
+extension GalleryCollectionVC: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
@@ -282,10 +285,10 @@ extension GalleryCollectionViewController: UISearchBarDelegate {
 
 //MARK: - PostCollectionViewCell Delegate
 
-extension GalleryCollectionViewController: PostCollectionViewCellDelegate {
+extension GalleryCollectionVC: PostCollectionViewCellDelegate {
     
     func postCollectionViewCell(cell: PostCollectionViewCell, didTapOn pictureURL: URL) {
-        let imageVC = ImageViewController()
+        let imageVC = ImageVC()
         imageVC.pictureURL = pictureURL
         
         navigationController?.show(imageVC, sender: self)
@@ -295,7 +298,7 @@ extension GalleryCollectionViewController: PostCollectionViewCellDelegate {
 
 //MARK: - PostsDataViewModel Delegate
 
-extension GalleryCollectionViewController: PostsDataViewModelDelegate {
+extension GalleryCollectionVC: PostsDataVMDelegate {
     
     func postsDataViewModelAddedNewPosts(count: Int, totalPages: Int) {
         if postsViewModel.shouldScrollToTop { scrollToTop() }

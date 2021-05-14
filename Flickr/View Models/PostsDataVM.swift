@@ -1,5 +1,5 @@
 //
-//  PostsDataViewModel.swift
+//  PostsDataVM.swift
 //  Flickr
 //
 //  Created by Daniil Kim on 12.05.2021.
@@ -8,12 +8,12 @@
 import Foundation
 import UIKit
 
-protocol PostsDataViewModelDelegate {
+protocol PostsDataVMDelegate {
     func postsDataViewModelAddedNewPosts(count: Int, totalPages: Int)
     func postsDataViewModelFailedToGetPosts(with tag: String?)
 }
 
-class PostsDataViewModel {
+class PostsDataVM {
     
     //MARK: - Properties
     
@@ -22,7 +22,7 @@ class PostsDataViewModel {
     private let flickrAPI = FlickrAPI()
     private let imageLoader = ImageLoader()
     
-    var delegate: PostsDataViewModelDelegate?
+    var delegate: PostsDataVMDelegate?
     
     var previousSearch = ""
     var shouldScrollToTop = false

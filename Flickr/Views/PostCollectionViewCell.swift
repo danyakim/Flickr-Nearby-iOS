@@ -20,12 +20,12 @@ class PostCollectionViewCell: UICollectionViewCell {
         
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        
         return imageView
     }()
     
     private let spinner: UIActivityIndicatorView = {
         let activityView = UIActivityIndicatorView(style: .large)
+        
         activityView.hidesWhenStopped = true
         return activityView
     }()
@@ -39,17 +39,17 @@ class PostCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+
         contentView.addSubview(picture)
-        
+
         picture.pinTo(contentView)
-        
+
         //add tap gesture
         let tap = UITapGestureRecognizer(target: self, action: #selector(showImage))
         picture.isUserInteractionEnabled = true
         picture.addGestureRecognizer(tap)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -70,9 +70,8 @@ class PostCollectionViewCell: UICollectionViewCell {
     }
     
     func startLoadingAnimation() {
-        spinner.center = CGPoint(x: contentView.bounds.width / 2,
-                                 y: contentView.bounds.height / 2)
-        contentView.insertSubview(spinner, aboveSubview: picture)
+        contentView.addSubview(spinner)
+        spinner.pinTo(contentView)
         spinner.startAnimating()
     }
     

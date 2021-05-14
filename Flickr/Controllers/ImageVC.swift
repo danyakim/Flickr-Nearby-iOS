@@ -1,5 +1,5 @@
 //
-//  ImageViewController.swift
+//  ImageVC.swift
 //  Flickr
 //
 //  Created by Daniil Kim on 05.05.2021.
@@ -7,8 +7,8 @@
 
 import UIKit
 
-class ImageViewController: UIViewController,
-                           UIScrollViewDelegate {
+class ImageVC: UIViewController,
+               UIScrollViewDelegate {
     
     //MARK: - IB Outlets
     
