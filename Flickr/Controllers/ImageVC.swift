@@ -12,12 +12,12 @@ class ImageVC: UIViewController,
     
     //MARK: - IB Outlets
     
-    let scrollView = UIScrollView()
-    let imageView = UIImageView()
+    private let scrollView = UIScrollView()
+    private let imageView = UIImageView()
     
     //MARK: - Properties
     
-    var pictureURL: URL?
+    let pictureURL: URL
     
     //MARK: - View Controller Lifecycle
     
@@ -27,6 +27,8 @@ class ImageVC: UIViewController,
         view.backgroundColor = .systemBackground
         
         setupScrollView()
+        setupImageView()
+        configureImage()
     }
     
     
@@ -36,9 +38,20 @@ class ImageVC: UIViewController,
         tabBarController?.tabBar.isHidden = true
     }
     
-    //MARK: - Helping Functions
+    //MARK: - Methods
     
-    func setupScrollView() {
+    init(pictureURL: URL) {
+        self.pictureURL = pictureURL
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    //MARK: - Private Methods
+    
+    private func setupScrollView() {
         view.addSubview(scrollView)
         
         scrollView.delegate = self
@@ -49,18 +62,17 @@ class ImageVC: UIViewController,
         scrollView.maximumZoomScale = 5
         
         scrollView.pinTo(view)
+    }
+    
+    private func setupImageView() {
         scrollView.addSubview(imageView)
         
         imageView.pinTo(scrollView, width: scrollView.widthAnchor, height: scrollView.heightAnchor)
         imageView.contentMode = .scaleAspectFit
         imageView.isUserInteractionEnabled = true
-        
-        configureImage()
     }
     
-    func configureImage() {
-        guard let pictureURL = pictureURL else { return }
-        
+    private func configureImage() {
         do {
             let imageData = try Data(contentsOf: pictureURL)
             DispatchQueue.main.async {

@@ -14,6 +14,7 @@ class GalleryCollectionVC: UICollectionViewController {
     
     lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
+        searchBar.autocapitalizationType = .none
         return searchBar
     }()
     
@@ -36,13 +37,9 @@ class GalleryCollectionVC: UICollectionViewController {
         
         postsViewModel.delegate = self
         
-        collectionView.prefetchDataSource = self
-        collectionView.register(PostCollectionViewCell.self, forCellWithReuseIdentifier: K.cells.reuseIdentifier)
-        collectionView.showsVerticalScrollIndicator = false
+        configureCollectionView()
         
         if tabBarController?.tabBar.selectedItem?.tag == 1 { isSearch = true }
-        
-        navigationController?.navigationBar.isTranslucent = false
         
         if isSearch {
             searchBar.delegate = self
@@ -57,20 +54,18 @@ class GalleryCollectionVC: UICollectionViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if isSearch && postsViewModel.count() == 0 {
+        if isSearch && postsViewModel.count == 0 {
             searchBar.becomeFirstResponder()
         }
         
-        tabBarController?.tabBar.isHidden = false
-        tabBarController?.tabBar.tintColor = isSearch ? K.colors.red : K.colors.blue
-        tabBarController?.tabBar.unselectedItemTintColor = isSearch ? K.colors.blueUnselected : K.colors.redUnselected
+        configureTabBar()
     }
     
     //MARK: - Collection View Data Source
     
     override func collectionView(_ collectionView: UICollectionView,
                                  numberOfItemsInSection section: Int) -> Int {
-        return postsViewModel.count()
+        return postsViewModel.count
     }
     
     override func collectionView(_ collectionView: UICollectionView,
@@ -90,7 +85,7 @@ class GalleryCollectionVC: UICollectionViewController {
         //configure cell
         guard let cell = cell as? PostCollectionViewCell else { return }
         
-        let isLastCell = indexPath.row == postsViewModel.count() - 1 && page < totalPages
+        let isLastCell = indexPath.row == postsViewModel.count - 1 && page < totalPages
         
         cell.startLoadingAnimation()
         //continue loading animation until more posts are loaded
@@ -103,7 +98,7 @@ class GalleryCollectionVC: UICollectionViewController {
                                         loadingCompletion: updateCellClosure)
         
         //change page and load more results
-        if indexPath.row == postsViewModel.count() - 2 {
+        if indexPath.row == postsViewModel.count - 2 {
             if page < totalPages {
                 page += 1
                 
@@ -125,6 +120,24 @@ class GalleryCollectionVC: UICollectionViewController {
     
     //MARK: - Private Methods
     
+    private func configureCollectionView() {
+        collectionView.prefetchDataSource = self
+        collectionView.register(PostCollectionViewCell.self, forCellWithReuseIdentifier: K.cells.reuseIdentifier)
+        collectionView.showsVerticalScrollIndicator = false
+    }
+    
+    private func configureTabBar() {
+        tabBarController?.tabBar.isHidden = false
+        tabBarController?.tabBar.tintColor = isSearch ? K.colors.red : K.colors.blue
+        tabBarController?.tabBar.unselectedItemTintColor = isSearch ? K.colors.blueUnselected : K.colors.redUnselected
+    }
+    
+    private func configureLocationManager() {
+        locationManager = CLLocationManager()
+        locationManager?.delegate = self
+        locationManager?.requestWhenInUseAuthorization()
+    }
+    
     private func setLogo() {
         let logo = UIImage(named: K.imageNames.flickrLogo)
         
@@ -134,16 +147,6 @@ class GalleryCollectionVC: UICollectionViewController {
         logoButton.addTarget(self, action: #selector(scrollToTopAnimated), for: .touchUpInside)
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: logoButton)
-    }
-    
-    private func configureLocationManager() {
-        locationManager = CLLocationManager()
-        locationManager?.delegate = self
-        locationManager?.requestWhenInUseAuthorization()
-    }
-    
-    private func configureCollectionView() {
-        
     }
     
     private func hideKeyboardWhenTappedOutside() {
@@ -288,27 +291,25 @@ extension GalleryCollectionVC: UISearchBarDelegate {
 extension GalleryCollectionVC: PostCollectionViewCellDelegate {
     
     func postCollectionViewCell(cell: PostCollectionViewCell, didTapOn pictureURL: URL) {
-        let imageVC = ImageVC()
-        imageVC.pictureURL = pictureURL
-        
+        let imageVC = ImageVC(pictureURL: pictureURL)
         navigationController?.show(imageVC, sender: self)
     }
     
 }
 
-//MARK: - PostsDataViewModel Delegate
+//MARK: - PostsDataVM Delegate
 
 extension GalleryCollectionVC: PostsDataVMDelegate {
     
     func postsDataVMAddedNewPosts(count: Int, totalPages: Int) {
-        if postsViewModel.shouldScrollToTop { scrollToTop() }
+        if postsViewModel.isNewSearch { scrollToTop() }
         
         self.totalPages = totalPages
         
         //insert new posts
-        let lastIndexBeforeUpdate = postsViewModel.count() - count
+        let lastIndexBeforeUpdate = postsViewModel.count - count
         var indexPaths = [IndexPath]()
-        for row in lastIndexBeforeUpdate ..< postsViewModel.count() {
+        for row in lastIndexBeforeUpdate ..< postsViewModel.count {
             indexPaths.append(IndexPath(row: row, section: 0))
         }
         collectionView.insertItems(at: indexPaths)

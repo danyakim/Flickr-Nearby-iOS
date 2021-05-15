@@ -34,6 +34,7 @@ class TabBarController: UITabBarController {
         navController.tabBarItem.title = title
         navController.tabBarItem.image = image
         navController.tabBarItem.tag = tag
+        navController.navigationBar.isTranslucent = false
         return navController
     }
     

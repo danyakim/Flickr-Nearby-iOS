@@ -82,10 +82,10 @@ class FlickrAPI {
         
         for photo in photoArray {
             guard let availableResolution = photo["url_n"] ??
-                photo["url_s"] ??
-                photo["url_q"] ??
-                photo["url_sq"] ??
-                photo["url_t"] else { continue }
+                    photo["url_s"] ??
+                    photo["url_q"] ??
+                    photo["url_sq"] ??
+                    photo["url_t"] else { continue }
             
             let highestAvailableResolution = photo["url_l"] ??
                 photo["url_c"] ??
@@ -93,8 +93,10 @@ class FlickrAPI {
                 photo["url_m"] ??
                 availableResolution
             
-            guard let pictureURL = URL(string: availableResolution as? String ?? ""),
-                  let highResURL = URL(string: highestAvailableResolution as? String ?? "") else { continue }
+            guard let pictureURLString = availableResolution as? String,
+                  let highResUrlString = highestAvailableResolution as? String,
+                  let pictureURL = URL(string: pictureURLString),
+                  let highResURL = URL(string: highResUrlString) else { continue }
             
             if uniquePosts.insert(pictureURL).inserted == false { continue }
             

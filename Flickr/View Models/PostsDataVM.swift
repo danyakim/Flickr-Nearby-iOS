@@ -18,6 +18,9 @@ class PostsDataVM {
     //MARK: - Properties
     
     private var posts = [Post]()
+    var count: Int {
+        posts.count
+    }
     
     private let flickrAPI = FlickrAPI()
     private let imageLoader = ImageLoader()
@@ -25,13 +28,9 @@ class PostsDataVM {
     var delegate: PostsDataVMDelegate?
     
     var previousSearch = ""
-    var shouldScrollToTop = false
+    var isNewSearch = false
     
     //MARK: - Methods
-    
-    func count() -> Int {
-        return posts.count
-    }
     
     func loadPosts(near coordinates: (lat: String, lon: String)?, on page: Int = 1) {
         //if caller wants posts near location
@@ -42,10 +41,12 @@ class PostsDataVM {
         flickrAPI.getPhotos(location: (coordinates.lat, coordinates.lon),
                             page: page) { result in
             switch result {
+            
             case .success(let response):
                 DispatchQueue.main.async {
                     self.updatePostsAndTotalPages(with: response!)
                 }
+            
             case .failure(let error):
                 print("Failed to get photos: ", error.localizedDescription)
                 DispatchQueue.main.async {
@@ -59,10 +60,11 @@ class PostsDataVM {
     func loadPosts(tagged tag: String, on page: Int = 1) {
         flickrAPI.getPhotos(tag: tag, page: page) { result in
             switch result {
+            
             case .success(let response):
-                self.shouldScrollToTop = false
+                self.isNewSearch = false
                 if tag != self.previousSearch {
-                    self.shouldScrollToTop = true
+                    self.isNewSearch = true
                     self.posts = []
                 }
                 self.previousSearch = tag
