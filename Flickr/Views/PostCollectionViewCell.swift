@@ -55,15 +55,15 @@ class PostCollectionViewCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         picture.image = nil
+        startLoadingAnimation()
         highResPictureURL = nil
     }
     
     func configure(image picture: UIImage?, highResolutionURL: URL) {
         highResPictureURL = highResolutionURL
         
-        spinner.stopAnimating()
-        
         DispatchQueue.main.async {
+            self.spinner.stopAnimating()
             self.picture.image = picture
         }
     }
@@ -72,6 +72,10 @@ class PostCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(spinner)
         spinner.pinTo(contentView)
         spinner.startAnimating()
+    }
+    
+    func stopLoadingAnimation() {
+        spinner.stopAnimating()
     }
     
     //MARK: - Helping functions

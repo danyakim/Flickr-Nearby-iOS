@@ -25,7 +25,6 @@ class ImageLoader {
     
     func getImage(at url: URL, completion: @escaping (UIImage) -> ()) {
         if let pictureLoader = loadingOperations[url] {
-            
             if let cachedImage = imageCache.object(forKey: url as NSURL) {
                 completion(cachedImage)
             } else {
@@ -55,7 +54,6 @@ class ImageLoader {
     
     func startLoadingImages(at urls: [URL]) {
         for url in urls {
-            
             if let _ = loadingOperations[url] {
                 continue
             }
@@ -85,12 +83,13 @@ class ImageLoader {
     
 }
 
-//MARK: - ImageLoader Delegate
+//MARK: - LoadPictureOperation Delegate
 
 extension ImageLoader: LoadPictureOperationDelegate {
     
     func loadPictureOperation(finishedLoading image: UIImage, for url: URL) {
         imageCache.setObject(image, forKey: url as NSURL)
+        loadingOperations.removeValue(forKey: url)
     }
     
 }

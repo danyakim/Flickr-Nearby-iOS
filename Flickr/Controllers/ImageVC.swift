@@ -10,10 +10,10 @@ import UIKit
 class ImageVC: UIViewController,
                UIScrollViewDelegate {
     
-    //MARK: - IB Outlets
+    //MARK: - Views
     
-    private let scrollView = UIScrollView()
     private let imageView = UIImageView()
+    private let scrollView = UIScrollView()
     
     //MARK: - Properties
     
@@ -31,18 +31,12 @@ class ImageVC: UIViewController,
         configureImage()
     }
     
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        tabBarController?.tabBar.isHidden = true
-    }
-    
     //MARK: - Methods
     
     init(pictureURL: URL) {
         self.pictureURL = pictureURL
         super.init(nibName: nil, bundle: nil)
+        hidesBottomBarWhenPushed = true
     }
     
     required init?(coder: NSCoder) {

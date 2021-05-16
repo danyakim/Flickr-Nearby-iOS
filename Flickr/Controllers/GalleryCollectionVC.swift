@@ -124,6 +124,7 @@ class GalleryCollectionVC: UICollectionViewController {
         collectionView.prefetchDataSource = self
         collectionView.register(PostCollectionViewCell.self, forCellWithReuseIdentifier: K.cells.reuseIdentifier)
         collectionView.showsVerticalScrollIndicator = false
+        collectionView.backgroundColor = .systemBackground
     }
     
     private func configureTabBar() {
@@ -317,7 +318,9 @@ extension GalleryCollectionVC: PostsDataVMDelegate {
         //remove loading indicator from last cell
         if lastIndexBeforeUpdate > 0 {
             let loadingIndicatorPath = IndexPath(row: lastIndexBeforeUpdate - 1, section: 0)
-            collectionView.reloadItems(at: [loadingIndicatorPath])
+            if let cell = collectionView.cellForItem(at: loadingIndicatorPath) as? PostCollectionViewCell {
+                collectionView(collectionView, willDisplay: cell, forItemAt: loadingIndicatorPath)
+            }
         }
     }
     

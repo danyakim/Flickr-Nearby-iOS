@@ -28,14 +28,14 @@ class LoadPictureOperation: Operation {
         
         var image: UIImage
         guard let imageData = try? Data(contentsOf: pictureURL) else { return }
-        image = UIImage(data: imageData)!
-        
+        image = UIImage(data: imageData) ?? UIImage(systemName: "photo")!
+
         delegate.loadPictureOperation(finishedLoading: image, for: pictureURL)
         
+        if isCancelled { return }
+        
         if let loadingCompletionHandler = loadingCompletionHandler {
-            DispatchQueue.main.async {
-                loadingCompletionHandler(image)
-            }
+            loadingCompletionHandler(image)
         }
     }
 }
